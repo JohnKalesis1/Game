@@ -15,6 +15,14 @@ float series(int recursion,int agility)  {
     }
 }
 
+int high_stat_random_value()  {
+
+}
+
+int low_stat_random_value()  {
+
+}
+
 namespace name_pool {
     std::string hero_names[98]={"Abbathor","Aerdrie Faenya","Arvoreen","Baervan Wildwanderer","Baravar Cloakshadow","Berronar Truesilver","Brandobaris","Callarduran Smoothhands","Charmalaine","Clangeddin Silverbeard","Corellon Larethian","Cyrrollalee","Deep Sashelas","Dugmaren Brightmantle","Dumathoin","Ehlonna","Erevan Ilesere","Fenmarel Mestarine","Fharlanghn","Flandal Steelskin","Gadhelyn","Gaerdal Ironhand","Garl Glittergold","Gendwar Argrim","Halani Celanil","Heironeous","Labelas Enoreth","Moradin","Muamman Duathal","Olidammara","Pelor","Rillifane Rallathil","Roykyn","Segojan Earthcaller","Sehanine Moonbow","Sheela Peryroyl","Solonor Thelandira","St. Cuthbert","Urdlen","Urogalan","Vergadain","Ye'Cind","Yondalla","Annam","Bahamut","Blibdoolpoolp","Diirinka","Eadro","Gruumsh","Hruggek","Ilsensine","Jubilex","Kurtulmak","Laduguer","Loagzed","Lolth","Maglubiyet","Merrshaulk","Orcus","Sekolah","Semuanya","Shekinester","Skerrit","Stronmaus","Tiamat","Vaprak","Yeenoghu","Aasterinian","Bagrivyek","Bahgtru","Chronepsis","Doresain","Falazure","Gaknulak","Grankhul","Great Mother","Grolantor","Hiatea","Iallanis","Ilneval","Io","Karontor","Kiaransalee","Khurgorbaeyag","Luthic","Memnor","Nomog-Geaya","Panzuriel","Raxivort","Shargaas","Sixin","Skoraeus Stonebones","Squerrik","Surtr","Thrym","Vhaeraun","Yurtrus","Zinzerena"};
     std::string potion_names[66]={"Potion","Hi-Potion","X-Potion","Mega-Potion","Ether","Turbo Ether","Elixir","Megalixir","Phoenix Down","Mega Phoenix","Antidote","Echo Screen","Eye Drops","Holy Water","Remedy","Soft","Al Bhed Potion","Healing Water","Tetra Elemental","Candle of Life","Dream Powder","Farplane Shadow","Farplane Wind","Frag Grenade","Silence Grenade","Sleeping Powder","Smoke Bomb","Petrify Grenade","Poison Fang","Blessed Gem","Dark Matter","Shadow Gem","Shining Gem","Supreme Gem","Gold Hourglass","Healing Spring","Light Curtain","Lunar Curtain","Mana Spring","Mana Tablet","Mana Tonic","Purifying Salt","Silver Hourglass","Soul Spring","Stamina Spring","Stamina Tablet","Stamina Tonic","Star Curtain","Three Stars","Twin Stars","Ability Distiller","Amulet","Designer Wallet","Door to Tomorrow","Gambler's Spirit","Hypello Potion","Mana Distiller","Map","Musk","Pendulum","Power Distiller","Shining Thorn","Speed Distiller","Underdog's Secret","Wings to Discovery","Winning Formula"};
@@ -84,8 +92,7 @@ namespace name_pool {
 };
 
 
-//////////////////////////////////////////////////////Effect////////////////////////////
-
+//////////////////////////////////////////////////////Effect///////////////////////////////////////////
 
 bool Effect::is_active() {
     if (duration>0)  {
@@ -101,7 +108,7 @@ void Effect::reduce_duration()  {
 }
 
 int Effect::apply_effect(int stat_value)  {
-    return (int)(percentage*((float)stat_value));
+    return (int)((1.0+percentage)*((float)stat_value));
 }
 
 int Effect::get_stat_affected()  {
@@ -111,7 +118,7 @@ int Effect::get_stat_affected()  {
 
 
 
-//////////////////////////////////////////////////////Item////////////////////////////
+//////////////////////////////////////////////////////Item////////////////////////////////////////////
 
 int Item::get_lvl_requirement()  {
     return lvl_requirement;
@@ -127,7 +134,7 @@ std::string Item::get_name()  {
 
 
 
-//////////////////////////////////////////////////////Potion////////////////////////////
+//////////////////////////////////////////////////////Potion/////////////////////////////////////////
 
 int Weapon::attack()  {
     return damage;
@@ -139,7 +146,7 @@ bool Weapon::Two_handed_weapon()  {
 
 
 
-//////////////////////////////////////////////////////Armor////////////////////////////
+//////////////////////////////////////////////////////Armor///////////////////////////////////////////
 
 int Armor::defend()  {
     return defense;
@@ -158,7 +165,7 @@ void Potion::use(Hero* hero)  {
 }
 
 
-//////////////////////////////////////////////////////Spell////////////////////////////
+//////////////////////////////////////////////////////Spell//////////////////////////////////////////////
 
 void Spell::initiate_spell(Monster* monster)  {
     monster->receive_damage(avg_damage);
@@ -182,21 +189,21 @@ std::string Spell::get_name()  {
 }
 
 
-//////////////////////////////////////////////////////LigthingSpell////////////////////////////
+//////////////////////////////////////////////////////LigthingSpell//////////////////////////////////////
 
 LigthingSpell::LigthingSpell(std::string name,int price,int lvl,int mp_usage,int damage) : Spell(name,price,lvl,mp_usage,damage) {
     effect=Effect(0,0,2);
 }
 
 
-//////////////////////////////////////////////////////IceSpell////////////////////////////
+//////////////////////////////////////////////////////IceSpell//////////////////////////////////////////
 
 IceSpell::IceSpell(std::string name,int price,int lvl,int mp_usage,int damage) : Spell(name,price,lvl,mp_usage,damage) {
     effect=Effect(0,0,0);
 }
 
 
-//////////////////////////////////////////////////////FireSpell////////////////////////////
+//////////////////////////////////////////////////////FireSpell////////////////////////////////////////
 
 FireSpell::FireSpell(std::string name,int price,int lvl,int mp_usage,int damage) : Spell(name,price,lvl,mp_usage,damage) {
     effect=Effect(0,0,1);
@@ -204,7 +211,7 @@ FireSpell::FireSpell(std::string name,int price,int lvl,int mp_usage,int damage)
 
 
 
-//////////////////////////////////////////////////////LivingBeing////////////////////////////
+//////////////////////////////////////////////////////LivingBeing///////////////////////////////////////
 
 std::string LivingBeing::get_name()  {
     return name;
@@ -229,7 +236,13 @@ void LivingBeing::restore_life(int amount)  {
 
 
 
-//////////////////////////////////////////////////////Hero////////////////////////////
+//////////////////////////////////////////////////////Hero//////////////////////////////////////////////
+
+Hero::Hero(std::string name,int health,int magic_power_capacity,int strength,int dexterity,int agility,int money)  : LivingBeing(name,health,1), magic_power_capacity(magic_power), magic_power(magic_power), strength(strength), base_strength(strength), base_dexterity(dexterity), dexterity(dexterity), base_agility(agility), agility(agility), money(money), armor(NULL), weapon(NULL)  {\
+    for (int i=0;i<3;i++)  {
+        effects.push_back(Effect());
+    }
+}        
 
 
 Hero::~Hero()  {
@@ -266,16 +279,31 @@ int Hero::get_magic_power_capacity()  {
     return magic_power_capacity;
 }
 
-int Hero::get_strenght()  {
-    return strength;
+int Hero::get_strength()  {
+    if (effects.at(0).is_active())  {
+        return effects.at(0).apply_effect(strength);
+    }
+    else  {
+        return strength;
+    }
 }
 
 int Hero::get_dexterity()  {
-    return dexterity;
+    if (effects.at(1).is_active())  {
+        return effects.at(1).apply_effect(dexterity);
+    }
+    else  {
+        return dexterity;
+    }
 }
 
 int Hero::get_agility()  {
-    return agility;
+    if (effects.at(2).is_active())  {
+        return effects.at(2).apply_effect(agility);
+    }
+    else  {
+        return agility;
+    }
 }
 
 int Hero::get_wealth()  {
@@ -287,7 +315,7 @@ int Hero::get_experience()  {
 }
 
 bool Hero::evade()  {
-    float evasion_chance=series(5,agility);
+    float evasion_chance=series(5,get_agility());
     float random_float=(float)rand()/(float)RAND_MAX;
     if (random_float<evasion_chance)  {
         return true;
@@ -328,7 +356,7 @@ void Hero::level_up()  {
 }
 
 void Hero::attack(Monster* monster)  {
-    monster->receive_damage(weapon->attack()+strength);
+    monster->receive_damage(weapon->attack()+get_strength());
 }
 
 void Hero::restore_mp(int amount)  {
@@ -369,8 +397,117 @@ void Hero::lose_money(int amount)  {
 }
 
 void Hero::replace_weapon(std::string weapon_name)  {
-    
+    std::vector<Item*>::iterator it=item_box.begin();
+    for (int i=0;i<item_box.size();i++)  {
+        if (item_box.at(i)->get_name().compare(weapon_name)==0)  {
+            weapon=(Weapon*)item_box.at(i);
+            if (weapon->Two_handed_weapon())  {
+                unequip_armor();
+            }
+            return;
+        }
+        else  {
+            std::advance(it,1);
+        }
+    }
+}
+
+void Hero::replace_armor(std::string armor_name)  {
+    std::vector<Item*>::iterator it=item_box.begin();
+    for (int i=0;i<item_box.size();i++)  {
+        if (item_box.at(i)->get_name().compare(armor_name)==0)  {
+            armor=(Armor*)item_box.at(i);
+            if (weapon->Two_handed_weapon())  {
+                unequip_weapon();
+            }
+            return;
+        }
+        else  {
+            std::advance(it,1);
+        }
+    }
+}
+
+void Hero::unequip_weapon()  {
+    weapon=NULL;
+}
+
+void Hero::unequip_armor()  {
+    armor=NULL;
+}
+
+void Hero::use_potion(std::string potion_name)  {
+    std::vector<Item*>::iterator it=item_box.begin();
+    for (int i=0;i<item_box.size();i++)  {
+        if (item_box.at(i)->get_name().compare(potion_name)==0)  {
+            ((Potion*)item_box.at(i))->use(this);
+            return;
+        }
+        else  {
+            std::advance(it,1);
+        }
+    }
+}
+
+void Hero::receive_buff(Effect effect)  {
+    effects.at(effect.get_stat_affected())=effect;
 }
 
 
+//////////////////////////////////////////////////////Warrior////////////////////////////////////////
 
+Warrior::Warrior(std::string name) : Hero(name,400,100,high_stat_random_value(),low_stat_random_value(),high_stat_random_value(),100)  {}
+
+
+//////////////////////////////////////////////////////Paladin////////////////////////////////////////
+
+Paladin::Paladin(std::string name) : Hero(name,400,100,high_stat_random_value(),high_stat_random_value(),low_stat_random_value(),100)  {}
+
+
+//////////////////////////////////////////////////////Sorcerer////////////////////////////////////////
+
+Sorcerer::Sorcerer(std::string name) : Hero(name,400,100,low_stat_random_value(),high_stat_random_value(),high_stat_random_value(),100)  {}
+
+
+//////////////////////////////////////////////////////Monster////////////////////////////////////////
+
+Monster::Monster(std::string name,int avg_damage,int defense,int evasion_chance,int lvl) : LivingBeing(name,(int)(((float)(lvl-1))/10.0+1)*520,lvl), avg_damage(avg_damage), defense(defense), evasion_chance(evasion_chance)  {
+    for (int i=0;i<3;i++)  {
+        effects.push_back(Effect());
+    }
+}
+
+void Monster::diplay_stats()  {
+
+}
+
+void Monster::attack(Hero* hero)  {
+    if (effects.at(0).is_active())  {
+        hero->receive_damage(effects.at(0).apply_effect(avg_damage));
+    }
+    else  {
+        hero->receive_damage(avg_damage);
+    }
+}
+
+bool Monster::evade()  {
+
+}
+
+void Monster::receive_damage(int damage)  {
+    if (evade)  {
+
+    }
+    else  {
+        int true_defense;
+        if (effects.at(1).is_active())  {
+            true_defense=effects.at(1).apply_effect(defense);
+        }
+        else  {
+            true_defense=defense;
+        }
+        if (damage>true_defense)  {
+            health=health+true_defense-damage;
+        }  
+    }
+}

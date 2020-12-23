@@ -3,9 +3,6 @@
 #include <vector>
 #include "entities.h"
 
-class Hero;
-class Monster;
-
 float series(int recursion,int agility)  {
     if (recursion==agility)  {
         return 0;
@@ -261,14 +258,13 @@ Hero::~Hero()  {
     delete armor;
     delete weapon;
     while (item_box.size()!=0)  {
-        std::vector<Item*>::iterator it=item_box.begin();
+        std::list<Item*>::iterator it=item_box.begin();
         Item* to_delete=it.operator*();
         item_box.erase(it);
         delete to_delete;
     }
-    std::vector<Spell*>::iterator it2=spells.begin();
     while (spells.size()!=0)  {
-        std::vector<Spell*>::iterator it2=spells.begin();
+        std::list<Spell*>::iterator it2=spells.begin();
         Spell* to_delete=it2.operator*();
         spells.erase(it2);
         delete to_delete;
@@ -345,10 +341,10 @@ bool Hero::try_and_level_up()  {
 }
 
 void Hero::cast_spell(std::string spell_name,Monster* monster)  {
-    std::vector<Spell*>::iterator it=spells.begin();
+    std::list<Spell*>::iterator it=spells.begin();
     for (int i=0;i<spells.size();i++)  {
-        if (spells.at(i)->get_name().compare(spell_name)==0)  {
-            spells.at(i)->initiate_spell(monster);
+        if (it.operator*()->get_name().compare(spell_name)==0)  {
+            it.operator*()->initiate_spell(monster);
             return ;
         }
         else  {
@@ -409,10 +405,10 @@ void Hero::lose_money(int amount)  {
 }
 
 void Hero::replace_weapon(std::string weapon_name)  {
-    std::vector<Item*>::iterator it=item_box.begin();
+    std::list<Item*>::iterator it=item_box.begin();
     for (int i=0;i<item_box.size();i++)  {
-        if (item_box.at(i)->get_name().compare(weapon_name)==0)  {
-            weapon=(Weapon*)item_box.at(i);
+        if (it.operator*()->get_name().compare(weapon_name)==0)  {
+            weapon=(Weapon*)it.operator*();
             if (weapon->Two_handed_weapon())  {
                 unequip_armor();
             }
@@ -425,10 +421,10 @@ void Hero::replace_weapon(std::string weapon_name)  {
 }
 
 void Hero::replace_armor(std::string armor_name)  {
-    std::vector<Item*>::iterator it=item_box.begin();
+    std::list<Item*>::iterator it=item_box.begin();
     for (int i=0;i<item_box.size();i++)  {
-        if (item_box.at(i)->get_name().compare(armor_name)==0)  {
-            armor=(Armor*)item_box.at(i);
+        if (it.operator*()->get_name().compare(armor_name)==0)  {
+            armor=(Armor*)it.operator*();
             if (weapon->Two_handed_weapon())  {
                 unequip_weapon();
             }
@@ -449,10 +445,10 @@ void Hero::unequip_armor()  {
 }
 
 void Hero::use_potion(std::string potion_name)  {
-    std::vector<Item*>::iterator it=item_box.begin();
+    std::list<Item*>::iterator it=item_box.begin();
     for (int i=0;i<item_box.size();i++)  {
-        if (item_box.at(i)->get_name().compare(potion_name)==0)  {
-            ((Potion*)item_box.at(i))->use(this);
+        if (it.operator*()->get_name().compare(potion_name)==0)  {
+            ((Potion*)it.operator*())->use(this);
             return;
         }
         else  {
@@ -463,6 +459,40 @@ void Hero::use_potion(std::string potion_name)  {
 
 void Hero::receive_buff(Effect& effect)  {
     effects.at(effect.get_stat_affected())=effect;
+}
+
+Item* Hero::remove_item(std::string name)  {
+    std::list<Item*>::iterator it=item_box.begin();
+    for (int i=0;i<item_box.size();i++)  {
+        if (it.operator*()->get_name().compare(name)==0)  {
+            item_box.erase(it);
+            return;
+        }
+        else  {
+            std::advance(it,1);
+        }
+    }
+}
+
+void Hero::acquire_item(Item* item)  {
+    item_box.insert(item_box.begin(),item);
+}
+
+Spell* Hero::remove_spell(std::string name)  {
+    std::list<Spell*>::iterator it=spells.begin();
+    for (int i=0;i<spells.size();i++)  {
+        if (it.operator*()->get_name().compare(name)==0)  {
+            spells.erase(it);
+            return;
+        }
+        else  {
+            std::advance(it,1);
+        }
+    }
+}
+
+void Hero::acquire_spell(Spell* spell)  {
+    spells.insert(spells.begin(),spell);
 }
 
 //////////////////////////////////////////////////////Warrior////////////////////////////////////////

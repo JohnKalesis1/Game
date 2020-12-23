@@ -23,6 +23,31 @@ int low_stat_random_value()  {
 
 }
 
+int high_attack_random_value()  {
+
+}
+
+int low_attack_random_value()  {
+
+}
+
+int high_defense_random_value()  {
+
+}
+
+int low_defense_random_value()  {
+    
+}
+
+float high_evasion_random_value()  {
+
+}
+
+float low_evasion_random_value()  {
+    
+}
+
+
 namespace name_pool {
     std::string hero_names[98]={"Abbathor","Aerdrie Faenya","Arvoreen","Baervan Wildwanderer","Baravar Cloakshadow","Berronar Truesilver","Brandobaris","Callarduran Smoothhands","Charmalaine","Clangeddin Silverbeard","Corellon Larethian","Cyrrollalee","Deep Sashelas","Dugmaren Brightmantle","Dumathoin","Ehlonna","Erevan Ilesere","Fenmarel Mestarine","Fharlanghn","Flandal Steelskin","Gadhelyn","Gaerdal Ironhand","Garl Glittergold","Gendwar Argrim","Halani Celanil","Heironeous","Labelas Enoreth","Moradin","Muamman Duathal","Olidammara","Pelor","Rillifane Rallathil","Roykyn","Segojan Earthcaller","Sehanine Moonbow","Sheela Peryroyl","Solonor Thelandira","St. Cuthbert","Urdlen","Urogalan","Vergadain","Ye'Cind","Yondalla","Annam","Bahamut","Blibdoolpoolp","Diirinka","Eadro","Gruumsh","Hruggek","Ilsensine","Jubilex","Kurtulmak","Laduguer","Loagzed","Lolth","Maglubiyet","Merrshaulk","Orcus","Sekolah","Semuanya","Shekinester","Skerrit","Stronmaus","Tiamat","Vaprak","Yeenoghu","Aasterinian","Bagrivyek","Bahgtru","Chronepsis","Doresain","Falazure","Gaknulak","Grankhul","Great Mother","Grolantor","Hiatea","Iallanis","Ilneval","Io","Karontor","Kiaransalee","Khurgorbaeyag","Luthic","Memnor","Nomog-Geaya","Panzuriel","Raxivort","Shargaas","Sixin","Skoraeus Stonebones","Squerrik","Surtr","Thrym","Vhaeraun","Yurtrus","Zinzerena"};
     std::string potion_names[66]={"Potion","Hi-Potion","X-Potion","Mega-Potion","Ether","Turbo Ether","Elixir","Megalixir","Phoenix Down","Mega Phoenix","Antidote","Echo Screen","Eye Drops","Holy Water","Remedy","Soft","Al Bhed Potion","Healing Water","Tetra Elemental","Candle of Life","Dream Powder","Farplane Shadow","Farplane Wind","Frag Grenade","Silence Grenade","Sleeping Powder","Smoke Bomb","Petrify Grenade","Poison Fang","Blessed Gem","Dark Matter","Shadow Gem","Shining Gem","Supreme Gem","Gold Hourglass","Healing Spring","Light Curtain","Lunar Curtain","Mana Spring","Mana Tablet","Mana Tonic","Purifying Salt","Silver Hourglass","Soul Spring","Stamina Spring","Stamina Tablet","Stamina Tonic","Star Curtain","Three Stars","Twin Stars","Ability Distiller","Amulet","Designer Wallet","Door to Tomorrow","Gambler's Spirit","Hypello Potion","Mana Distiller","Map","Musk","Pendulum","Power Distiller","Shining Thorn","Speed Distiller","Underdog's Secret","Wings to Discovery","Winning Formula"};
@@ -91,7 +116,6 @@ namespace name_pool {
     }
 };
 
-
 //////////////////////////////////////////////////////Effect///////////////////////////////////////////
 
 bool Effect::is_active() {
@@ -115,9 +139,6 @@ int Effect::get_stat_affected()  {
     return stat_affected;
 }
 
-
-
-
 //////////////////////////////////////////////////////Item////////////////////////////////////////////
 
 int Item::get_lvl_requirement()  {
@@ -133,8 +154,7 @@ std::string Item::get_name()  {
 }
 
 
-
-//////////////////////////////////////////////////////Potion/////////////////////////////////////////
+/////////////////////////////////////////////////////Potion/////////////////////////////////////////
 
 int Weapon::attack()  {
     return damage;
@@ -145,13 +165,11 @@ bool Weapon::Two_handed_weapon()  {
 }
 
 
-
 //////////////////////////////////////////////////////Armor///////////////////////////////////////////
 
 int Armor::defend()  {
     return defense;
 }
-
 
 
 //////////////////////////////////////////////////////Potion///////////////////////////////////////////////////////////////////
@@ -163,7 +181,6 @@ Potion::Potion(std::string name,int price,int lvl,int duration,float percentage,
 void Potion::use(Hero* hero)  {
     hero->receive_buff(effect);
 }
-
 
 //////////////////////////////////////////////////////Spell//////////////////////////////////////////////
 
@@ -188,13 +205,11 @@ std::string Spell::get_name()  {
     return name;
 }
 
-
 //////////////////////////////////////////////////////LigthingSpell//////////////////////////////////////
 
 LigthingSpell::LigthingSpell(std::string name,int price,int lvl,int mp_usage,int damage) : Spell(name,price,lvl,mp_usage,damage) {
     effect=Effect(0,0,2);
 }
-
 
 //////////////////////////////////////////////////////IceSpell//////////////////////////////////////////
 
@@ -202,13 +217,11 @@ IceSpell::IceSpell(std::string name,int price,int lvl,int mp_usage,int damage) :
     effect=Effect(0,0,0);
 }
 
-
 //////////////////////////////////////////////////////FireSpell////////////////////////////////////////
 
 FireSpell::FireSpell(std::string name,int price,int lvl,int mp_usage,int damage) : Spell(name,price,lvl,mp_usage,damage) {
     effect=Effect(0,0,1);
 }
-
 
 
 //////////////////////////////////////////////////////LivingBeing///////////////////////////////////////
@@ -233,7 +246,6 @@ void LivingBeing::restore_life(int amount)  {
         health=health+amount;
     }
 }
-
 
 
 //////////////////////////////////////////////////////Hero//////////////////////////////////////////////
@@ -449,25 +461,21 @@ void Hero::use_potion(std::string potion_name)  {
     }
 }
 
-void Hero::receive_buff(Effect effect)  {
+void Hero::receive_buff(Effect& effect)  {
     effects.at(effect.get_stat_affected())=effect;
 }
-
 
 //////////////////////////////////////////////////////Warrior////////////////////////////////////////
 
 Warrior::Warrior(std::string name) : Hero(name,400,100,high_stat_random_value(),low_stat_random_value(),high_stat_random_value(),100)  {}
 
-
 //////////////////////////////////////////////////////Paladin////////////////////////////////////////
 
 Paladin::Paladin(std::string name) : Hero(name,400,100,high_stat_random_value(),high_stat_random_value(),low_stat_random_value(),100)  {}
 
-
 //////////////////////////////////////////////////////Sorcerer////////////////////////////////////////
 
 Sorcerer::Sorcerer(std::string name) : Hero(name,400,100,low_stat_random_value(),high_stat_random_value(),high_stat_random_value(),100)  {}
-
 
 //////////////////////////////////////////////////////Monster////////////////////////////////////////
 
@@ -491,7 +499,20 @@ void Monster::attack(Hero* hero)  {
 }
 
 bool Monster::evade()  {
-
+    float random_float=(float)rand()/(float)RAND_MAX;
+    float true_evasion_chance;
+    if (effects.at(2).is_active())  {
+            true_evasion_chance=effects.at(2).apply_effect(evasion_chance);
+        }
+        else  {
+            true_evasion_chance=evasion_chance;
+        }
+    if (random_float<true_evasion_chance)  {
+        return true;
+    }
+    else  {
+        return false;
+    }
 }
 
 void Monster::receive_damage(int damage)  {
@@ -511,3 +532,25 @@ void Monster::receive_damage(int damage)  {
         }  
     }
 }
+
+void Monster::receive_debuff(Effect& effect)  {
+    effects.at(effect.get_stat_affected())=effect;
+}
+
+//////////////////////////////////////////////////////Dragon////////////////////////////////////////
+
+Dragon::Dragon(std::string name,int lvl) : Monster(name,high_attack_random_value()*(((float)(lvl-1))/10.0+1),low_defense_random_value()*(((float)(lvl-1))/10.0+1),low_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl)  {}
+
+//////////////////////////////////////////////////////Exoskeleton////////////////////////////////////////
+
+Exoskeleton::Exoskeleton(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))/10.0+1),high_defense_random_value()*(((float)(lvl-1))/10.0+1),low_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl)  {}
+
+
+//////////////////////////////////////////////////////Spirit////////////////////////////////////////
+
+Spirit::Spirit(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))/10.0+1),low_defense_random_value()*(((float)(lvl-1))/10.0+1),high_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl)  {}
+
+//////////////////////////////////////////////////////Party////////////////////////////////////////
+
+
+

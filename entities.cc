@@ -1,11 +1,24 @@
+//#include "entities.h"
+//#include <stdlib.h>
+//#include <iostream>
 #include <string>
 #include <list>
 #include <vector>
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include "entities.h"
 
+int main(int args,char *argv[])  {
+    Grid* game=new Grid(atoi(argv[1]),atoi(argv[2]));
+    game->receive_input();
+    delete game;
+}
+
+
 static int quit_game=false;
+
+int Market::store_count=1;
 
 float series(int recursion,int agility)  {
     if (recursion==agility)  {
@@ -17,63 +30,75 @@ float series(int recursion,int agility)  {
 }
 
 int high_stat_random_value()  {
-
+    return 0;
 }
 
 int low_stat_random_value()  {
-
+    return 0;
 }
 
 int high_attack_random_value()  {
-
+    return 0;
 }
 
 int low_attack_random_value()  {
-
+    return 0;
 }
 
 int high_defense_random_value()  {
-
+    return 0;
 }
 
 int low_defense_random_value()  {
-    
+    return 0;    
 }
 
 float high_evasion_random_value()  {
-
+    return 0.0;
 }
 
 float low_evasion_random_value()  {
-    
+    return 0.0;    
 }
 
 int get_random_number_of_wares()  {
-
+    return 0;
 }
 
 float get_encounter_chance()  {
-
+    return 0.0;
 }
 
 int get_weapon_attack(int level,bool two_handed)  {
-
+    return 0;
 }
 
 int get_armor_defense(int level)  {
-    
+    return 0;    
 }
 
 int get_potion_effect(int level,int type)  {
-    
+    return 0;    
 }
 
 int get_weapon_armor_price(int level)  {
-
+    return 0;
 }
 
 int get_potion_price(int level)  {
+    return 0;
+}
 
+int get_spell_price(int level)  {
+    return 0;
+}
+
+int get_spell_mp_cost(int level)  {
+    return 0;
+}
+
+int get_spell_damage(int level,int mp_cost)  {
+    return 0;
 }
 
 int damage_value(int average_damage)  {
@@ -242,6 +267,10 @@ int Item::get_price()  {
 
 std::string Item::get_name()  {
     return name;
+}
+
+short Item::get_type_of_item()  {
+    return type_of_item;
 }
 
 
@@ -544,6 +573,7 @@ Item* Hero::remove_item(std::string name)  {
             std::advance(it,1);
         }
     }
+    return NULL;
 }
 
 void Hero::acquire_item(Item* item)  {
@@ -562,6 +592,7 @@ Spell* Hero::remove_spell(std::string name)  {
             std::advance(it,1);
         }
     }
+    return NULL;
 }
 
 void Hero::acquire_spell(Spell* spell)  {
@@ -580,7 +611,7 @@ void Hero::receive_input(char input)  {
             show_availabe_armors_and_promt_for_swap();
             break;
         case 'c'://use a potion
-            show_availabe_potions_and_promt_for_swap();
+            show_availabe_potions_and_promt_for_use();
             break;
         default:
             break;
@@ -737,6 +768,78 @@ void Hero::show_availabe_armors_and_promt_for_swap()  {
     }
 }
 
+void Hero::show_availabe_potions_and_promt_for_use()  {
+    std::list<Item*>::iterator it=item_box.begin();
+    system("clear");
+    Armor* choices[item_box.size()];
+    int armors_count=0;
+    std::cout << "Armors:\n";
+    for (int i=0;i<item_box.size();i++)  {
+        if (it.operator*()->get_type_of_item()==0)  {
+            Armor* armor_candidate=(Armor*)it.operator*();
+            std::cout << std::to_string(i) <<"." << armor_candidate->get_name();
+            choices[armors_count]=armor_candidate;
+            armors_count++;
+            if (armor->get_name().compare(armor_candidate->get_name())==0)  {
+                std::cout << "(Equipped)";
+            }
+            std::cout << '\n';
+            std::cout <<" Defense: "<<armor_candidate->defend()<<'\n';
+            std::cout <<" Level: "<<armor_candidate->get_lvl_requirement()<<'\n';
+            std::cout <<" Price: "<<armor_candidate->get_price()/2<<'\n';
+        }
+    }
+    std::cout << "\nSelect which armor you want to equip:\n";
+    for (int i=0;i<armors_count;i++)  {
+        std::cout << std::to_string(i)<<"->"<<choices[armors_count]->get_name();
+        if (armor->get_name().compare(choices[armors_count]->get_name())==0)  {
+            std::cout << "(Equipped)";
+        }
+        if (choices[armors_count]->get_lvl_requirement()>level)  {
+            std::cout << "(Level"<<std::to_string(choices[armors_count]->get_lvl_requirement()) <<"required)";
+        }
+        std::cout << '\n';
+    }
+    std::string input;
+    std::cout << "Please enter an action:";
+    while (true)  {
+        std::cin >> input; 
+        if (check_number(input))  {
+            int pick=atoi(input.c_str());
+            if (pick<=armors_count && pick>0)  {
+                if (choices[pick]->get_lvl_requirement()<=level)  {
+                    if (choices[pick]->get_name().compare(armor->get_name()))  {
+                        std::cout<< "Weapon is already eqquiped\n";
+                    }
+                    else  {
+                        replace_armor(choices[pick]);
+                        return;
+                    }
+                }
+                else  {
+                    std::cout<< "Hero does not meet the requirements to use the weapon\n";
+                }
+            }
+            else  {
+                std::cout<< "Option not valid. Please enter an action:\n";
+                continue;
+            }
+        }
+        else  {
+            if (input.compare("q")==0)  {
+                quit_game=true;
+                return;
+            }
+            else if (input.compare("b")==0)  {
+                return;
+            }
+            else  {
+                std::cout<< "Option not valid. Please enter an action:\n";
+                continue;
+            }
+        }
+    }
+}
 
 //////////////////////////////////////////////////////Warrior////////////////////////////////////////
 
@@ -904,11 +1007,11 @@ void Hero_Party::victory()  {
 }
 
 void Hero_Party::move_up()  {
-    y_pos++;
+    y_pos--;
 }
 
 void Hero_Party::move_down()  {
-    y_pos--;
+    y_pos++;
 }
 
 void Hero_Party::move_left()  {
@@ -1016,6 +1119,7 @@ Monster* Monster_Party::get_target(std::string monster_name)  {
             return monsters.at(i);
         }
     }
+    return NULL;
 }
 
 void Monster_Party::victory()  {
@@ -1027,11 +1131,11 @@ void Monster_Party::victory()  {
 //////////////////////////////////////////////////////Fight////////////////////////////////////////
 
 Fight::Fight(Hero_Party* hero_party) : round_count(1), heroes_make_the_first_move(rand()%2), hero_party(hero_party)  {
-    monster_party=Monster_Party(hero_party->get_heroes_level(),hero_party->get_number_of_heroes());
+    monster_party=new Monster_Party(hero_party->get_heroes_level(),hero_party->get_number_of_heroes());
 }
 
 void Fight::monsters_turn()  {
-    monster_party.attack_heroes(*hero_party);
+    monster_party->attack_heroes(*hero_party);
 }
 
 void Fight::heroes_turn()  {
@@ -1039,7 +1143,7 @@ void Fight::heroes_turn()  {
 }
 
 void Fight::next_round()  {
-    monster_party.prepare_for_next_round();
+    monster_party->prepare_for_next_round();
     hero_party->prepare_for_next_round();
     round_count++;
 }
@@ -1051,6 +1155,8 @@ int Fight::get_current_round()  {
 //////////////////////////////////////////////////////Market////////////////////////////////////////
 
 Market::Market(int number_of_wares_to_generate)  {
+    store_number=store_count;
+    store_count++;
     while(number_of_wares_to_generate-->0)  {
         bool spell_or_item=rand()%2;
         if (spell_or_item)  {
@@ -1074,20 +1180,37 @@ Market::Market(int number_of_wares_to_generate)  {
         }
         else  {
             short type_of_spell=rand()%3;
-            switch (type_of_spell)  {
+            int level;
+            int mp_cost=get_spell_mp_cost(level);
+            switch (type_of_spell)  {    
                 case 0:
-                    spells.push_back(new LigthingSpell(name_pool::get_random_spell_name(),,,,));
+                    spells.push_back(new LigthingSpell(name_pool::get_random_spell_name(),get_spell_price(level),level,mp_cost,get_spell_damage(level,mp_cost)));
                     break;
                 case 1:
-                    spells.push_back(new FireSpell(name_pool::get_random_spell_name(),,,,));
+                    spells.push_back(new FireSpell(name_pool::get_random_spell_name(),get_spell_price(level),level,mp_cost,get_spell_damage(level,mp_cost)));
                     break;
                 case 2:
-                    spells.push_back(new IceSpell(name_pool::get_random_spell_name(),,,,));
+                    spells.push_back(new IceSpell(name_pool::get_random_spell_name(),get_spell_price(level),level,mp_cost,get_spell_damage(level,mp_cost)));
                     break;
                 default:
                     break;
             }
         }
+    }
+}
+
+Market::~Market()  {
+    while (items.size()!=0)  {
+        std::list<Item*>::iterator it=items.begin();
+        Item* to_delete=it.operator*();
+        items.erase(it);
+        delete to_delete;
+    }
+    while (spells.size()!=0)  {
+        std::list<Spell*>::iterator it2=spells.begin();
+        Spell* to_delete=it2.operator*();
+        spells.erase(it2);
+        delete to_delete;
     }
 }
 
@@ -1137,6 +1260,10 @@ void Market::receive_input(char input)  {
 
 }
 
+int Market::get_store_number()  {
+    return store_number;
+}
+
 //////////////////////////////////////////////////////Block////////////////////////////////////////
 
 Block::Block(bool accessible,bool has_a_market) : accessible(accessible) {
@@ -1183,6 +1310,9 @@ Market& Block::access_market()  {
     return *market;
 }
 
+int Block::get_store_number()  {
+    return market->get_store_number();
+}
 //////////////////////////////////////////////////////Grid////////////////////////////////////////
 
 Grid::Grid(int size,int number_of_heroes) : size(size), hero_vision(5) {
@@ -1195,10 +1325,10 @@ Grid::Grid(int size,int number_of_heroes) : size(size), hero_vision(5) {
     float density_of_blocks=0.2;
     hero_party=new Hero_Party((size+2*hero_vision)/2,(size+2*hero_vision)/2,number_of_heroes);
     World=new Block**[size+2*hero_vision];
-    for (int i=0;i<size;i++)  {
+    for (int i=0;i<size+2*hero_vision;i++)  {
         World[i]=new Block*[size+2*hero_vision];
-        for (int j=0;j<size;j++)  {
-            if (i>=hero_vision && i<size+hero_vision && j>=hero_vision && j<size+hero_vision)  {
+        for (int j=0;j<size+2*hero_vision;j++)  {
+            if (i>=hero_vision && i<(size+hero_vision) && j>=hero_vision && j<(size+hero_vision))  {
                 World[i][j]=NULL;
             }
             else  {
@@ -1229,7 +1359,7 @@ Grid::Grid(int size,int number_of_heroes) : size(size), hero_vision(5) {
             int possible_choices_counter=0;
             int possible_choices[size];
             for (int k=hero_vision;k<size+hero_vision;k++)  {
-                if (!World[i][k]->is_a_market() && (k>(size+2*hero_vision)/2+2) && (k<(size+2*hero_vision)/2-2))  {
+                if (!World[i][k]->is_a_market())  {
                     possible_choices[possible_choices_counter]=k;
                     possible_choices_counter++;
                 }
@@ -1251,29 +1381,86 @@ Grid::~Grid()  {
     delete[] World;
 }
 
-void Grid::print_world()  {
-
+void Grid::print_world(bool blocked_passage)  {
+    int centre_x=hero_party->get_x_position();
+    int centre_y=hero_party->get_y_position();
+    system("clear");
+    for (int i=centre_y-hero_vision;i<=centre_y+hero_vision;i++)  {
+        for (int k=0;k<2*hero_vision;k++)  {
+            std::cout << "---------";
+        }
+        std::cout << "-\n";
+        for (int j=centre_x-hero_vision;j<=centre_x+hero_vision;j++)  {
+            if (i==centre_y && j==centre_x)  {
+                if (World[i][j]->is_a_market())  {
+                    std::cout << " User(S)|";
+                }
+                else  {
+                    std::cout << "  User  |";
+                }
+            }
+            else  {
+                if (j==centre_x-hero_vision)  {
+                    std::cout <<'|';
+                }
+                if (World[i][j]->is_accessible())  {
+                    if (World[i][j]->is_a_market())  {
+                        std::cout << " Store"<< World[i][j]->get_store_number()<< " |";
+                    }
+                    else  {
+                        std::cout << "        |";
+                    }
+                }
+                else if (!World[i][j]->is_accessible())  {
+                    std::cout << " XXXXXX |";
+                }
+            }
+        }
+        std::cout << '\n';
+    }
+    std::cout << '\n';
+    std::cout << "Available options:\n";
+    std::cout << " (Move Up: w) ";
+    std::cout << "(Move Down: s) ";
+    std::cout << "(Move Left: a) ";
+    std::cout << "(Move Right: d) \n";
+    std::cout << " (Check Inventory: i) ";
+    std::cout << "(Equip Weapon: z) ";
+    std::cout << "(Equip Armor: x) ";
+    std::cout << "(Use Potion: c) \n";
+    std::cout << " (Display Stats: u) ";
+    if (hero_party->get_number_of_heroes()>1)  {
+        std::cout << "(Swap hero: h) ";
+    }
+    std::cout << "(Quit Game: q) \n";
+    if (blocked_passage)  {
+        std::cout << "An object is blocking the path.";
+    }
+    std::cout << "Please enter an action:\n";
 }
 
 void Grid::receive_input()  {
     char input;
+    bool blocked_passage=false;
     while(!quit_game)  {
-        print_world();
+        print_world(blocked_passage);
+        blocked_passage=false;
+        std::cin >> input;
         switch (input)  {
             case 'w' : //move up
-                if (World[hero_party->get_x_position()][hero_party->get_y_position()+1]->is_accessible())  {
-                    hero_party->receive_input(input);
-                }
-                else  {
-                    std::cout << "An object is blocking the path. Please enter an action:";
-                }
-                break;
-            case 's'://move down
                 if (World[hero_party->get_x_position()][hero_party->get_y_position()-1]->is_accessible())  {
                     hero_party->receive_input(input);
                 }
                 else  {
-                    std::cout << "An object is blocking the path. Please enter an action:";
+                    blocked_passage=true;
+                }
+                break;
+            case 's'://move down
+                if (World[hero_party->get_x_position()][hero_party->get_y_position()+1]->is_accessible())  {
+                    hero_party->receive_input(input);
+                }
+                else  {
+                    blocked_passage=true;
                 }
                 break;
             case 'a'://move left
@@ -1281,7 +1468,7 @@ void Grid::receive_input()  {
                     hero_party->receive_input(input);
                 }
                 else  {
-                    std::cout << "An object is blocking the path. Please enter an action:";
+                    blocked_passage=true;
                 }
                 break;
             case 'd'://move right
@@ -1289,7 +1476,7 @@ void Grid::receive_input()  {
                     hero_party->receive_input(input);
                 }
                 else  {
-                    std::cout << "An object is blocking the path. Please enter an action:";
+                    blocked_passage=true;
                 }
                 break;
             case 'i'://check inventory
@@ -1305,6 +1492,9 @@ void Grid::receive_input()  {
                 hero_party->receive_input(input);
                 break;
             case 'h'://take control of another hero
+                hero_party->receive_input(input);
+                break;
+            case 'u'://display hero stats
                 hero_party->receive_input(input);
                 break;
             case 'q':

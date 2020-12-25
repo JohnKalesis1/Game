@@ -5,6 +5,8 @@
 #include <iostream>
 #include "entities.h"
 
+static int quit_game=false;
+
 float series(int recursion,int agility)  {
     if (recursion==agility)  {
         return 0;
@@ -56,6 +58,15 @@ float get_encounter_chance()  {
 
 int damage_value(int average_damage)  {
     return 9*(average_damage/10.0)+rand()%(average_damage);
+}
+
+bool check_number(std::string str) {
+    for (int i = 0; i < str.length(); i++)  {
+        if (isdigit(str[i]) == false)  {
+            return false;
+        }
+    }
+    return true;
 }
 
 namespace name_pool {
@@ -331,7 +342,7 @@ void Hero::display_stats()  {
 
 }
 
-void Hero::access_inventory()  {
+void Hero::display_inventory()  {
 
 }
 
@@ -447,35 +458,17 @@ void Hero::lose_money(int amount)  {
     money=money-amount;
 }
 
-void Hero::replace_weapon(std::string weapon_name)  {
-    std::list<Item*>::iterator it=item_box.begin();
-    for (int i=0;i<item_box.size();i++)  {
-        if (it.operator*()->get_name().compare(weapon_name)==0)  {
-            weapon=(Weapon*)it.operator*();
-            if (weapon->Two_handed_weapon())  {
-                unequip_armor();
-            }
-            return;
-        }
-        else  {
-            std::advance(it,1);
-        }
+void Hero::replace_weapon(Weapon* weapon)  {
+    this->weapon=weapon;
+    if ((this->weapon)->Two_handed_weapon())  {
+        unequip_armor();
     }
 }
 
-void Hero::replace_armor(std::string armor_name)  {
-    std::list<Item*>::iterator it=item_box.begin();
-    for (int i=0;i<item_box.size();i++)  {
-        if (it.operator*()->get_name().compare(armor_name)==0)  {
-            armor=(Armor*)it.operator*();
-            if (weapon->Two_handed_weapon())  {
-                unequip_weapon();
-            }
-            return;
-        }
-        else  {
-            std::advance(it,1);
-        }
+void Hero::replace_armor(Armor* armor)  {
+    this->armor=armor;
+    if (weapon->Two_handed_weapon())  {
+        unequip_weapon();
     }
 }
 
@@ -487,19 +480,10 @@ void Hero::unequip_armor()  {
     armor=NULL;
 }
 
-void Hero::use_potion(std::string potion_name)  {
-    std::list<Item*>::iterator it=item_box.begin();
-    for (int i=0;i<item_box.size();i++)  {
-        if (it.operator*()->get_name().compare(potion_name)==0)  {
-            ((Potion*)it.operator*())->use(this);
-            Item* to_delete=remove_item(it.operator*()->get_name());
-            delete to_delete;
-            return;
-        }
-        else  {
-            std::advance(it,1);
-        }
-    }
+void Hero::use_potion(Potion* potion)  {
+    potion->use(this);
+    Item* to_delete=remove_item(potion->get_name());
+    delete to_delete;
 }
 
 void Hero::receive_buff(short stat_affected,int boost)  {
@@ -584,23 +568,77 @@ void Hero::receive_input(char input)  {
 void Hero::show_availabe_weapons_and_promt_for_swap()  {
     std::list<Item*>::iterator it=item_box.begin();
     system("clear");
+    Weapon* choices[item_box.size()];
+    int weapons_count=0;
     std::cout << "Weapons:\n";
     for (int i=0;i<item_box.size();i++)  {
         if (it.operator*()->get_type_of_item()==0)  {
             Weapon* weap=(Weapon*)it.operator*();
             std::cout << std::to_string(i) <<"." << weap->get_name();
+            choices[weapons_count]=weap;
+            weapons_count++;
             if (weapon->get_name().compare(weap->get_name())==0)  {
                 std::cout << "(Equipped)";
             }
-            std::cout <<"Attack: "<<std::to_string(weap->attack());
-            std::cout <<"Level: "<<weap->get_lvl_requirement();
-            std::cout <<"Price: "<<weap->get_price()/2;
+            std::cout << '\n';
+            std::cout <<" Attack: "<<std::to_string(weap->attack())<<'\n';
+            std::cout <<" Level: "<<weap->get_lvl_requirement()<<'\n';
+            std::cout <<" Price: "<<weap->get_price()/2<<'\n';
             if (weap->Two_handed_weapon())  {
-                std::cout <<"Note: Weapon must be used two-handed\n";
+                std::cout <<" Note: Weapon must be used two-handed\n";
             }
         }
     }
-    std::cout << "\nSelect which weapon you want to equip:\n"
+    std::cout << "\nSelect which weapon you want to equip:\n";
+    for (int i=0;i<weapons_count;i++)  {
+        std::cout << std::to_string(i)<<"->"<<choices[weapons_count]->get_name();
+        if (weapon->get_name().compare(choices[weapons_count]->get_name())==0)  {
+            std::cout << "(Equipped)";
+        }
+        if (choices[weapons_count]->get_lvl_requirement()>level)  {
+            std::cout << "(Level"<<std::to_string(choices[weapons_count]->get_lvl_requirement()) <<"required)";
+        }
+        std::cout << '\n';
+    }
+    std::string input;
+    std::cout << "Please enter an action:";
+    while (true)  {
+        std::cin >> input; 
+        if (check_number(input))  {
+            int pick=atoi(input.c_str());
+            if (pick<weapons_count)  {
+                if (choices[pick]->get_lvl_requirement()<=level)  {
+                    if (choices[pick]->get_name().compare(weapon->get_name()))  {
+                        std::cout<< "Weapon is already eqquiped\n";
+                    }
+                    else  {
+                        replace_weapon(choices[pick]);
+                        return;
+                    }
+                }
+                else  {
+                    std::cout<< "Hero does not meet the requirements to use the weapon\n";
+                }
+            }
+            else  {
+                std::cout<< "Option not valid. Please enter an action:\n";
+                continue;
+            }
+        }
+        else  {
+            if (input.compare("q")==0)  {
+                quit_game=true;
+                return;
+            }
+            else if (input.compare("b")==0)  {
+                return;
+            }
+            else  {
+                std::cout<< "Option not valid. Please enter an action:\n";
+                continue;
+            }
+        }
+    }
 }
 
 
@@ -939,7 +977,7 @@ Market::Market(int number_of_wares_to_generate)  {
             short type_of_spell=rand()%3;
             switch (type_of_spell)  {
                 case 0:
-                    spells.push_back(new LigthingSpell(name_pool::get_random_spell_name(),,,,);
+                    spells.push_back(new LigthingSpell(name_pool::get_random_spell_name(),,,,));
                     break;
                 case 1:
                     spells.push_back(new FireSpell(name_pool::get_random_spell_name(),,,,));
@@ -1048,7 +1086,7 @@ Market& Block::access_market()  {
 
 //////////////////////////////////////////////////////Grid////////////////////////////////////////
 
-Grid::Grid(int size,int number_of_heroes) : size(size) {
+Grid::Grid(int size,int number_of_heroes) : size(size), hero_vision(5) {
     srand(time(NULL));
     int quarter_x;
     int quarter_y;
@@ -1056,38 +1094,43 @@ Grid::Grid(int size,int number_of_heroes) : size(size) {
     int market_y_pos;
     int number_of_areas=(size/4);
     float density_of_blocks=0.2;
-    hero_party=new Hero_Party(size/2,size/2,number_of_heroes);
-    World=new Block**[size];
+    hero_party=new Hero_Party((size+2*hero_vision)/2,(size+2*hero_vision)/2,number_of_heroes);
+    World=new Block**[size+2*hero_vision];
     for (int i=0;i<size;i++)  {
-        World[i]=new Block*[size];
+        World[i]=new Block*[size+2*hero_vision];
         for (int j=0;j<size;j++)  {
-            World[i][j]=NULL;
+            if (i>=hero_vision && i<size+hero_vision && j>=hero_vision && j<size+hero_vision)  {
+                World[i][j]=NULL;
+            }
+            else  {
+                World[i][j]=new Block(0,0);
+            }
         }
     }
     encounter_chance=0.1;
     for (int i=0;i<number_of_areas-1;i++)  {
-        quarter_x=(size/number_of_areas)*i;
+        quarter_x=(size/number_of_areas)*i+hero_vision;
         for (int j=0;j<number_of_areas;j++)  {
-            quarter_y=(size/number_of_areas)*j;
+            quarter_y=(size/number_of_areas)*j+hero_vision;
             market_x_pos=quarter_x+rand()%(size/number_of_areas);
             market_y_pos=quarter_y+rand()%(size/number_of_areas);
             World[market_x_pos][market_y_pos]=new Block(1,1);
         }
     }
-    for (int i=0;i<size;i++)  {
-        for (int j=0;j<size;j++)  {
+    for (int i=0;i<size+2*hero_vision;i++)  {
+        for (int j=0;j<size+2*hero_vision;j++)  {
             if (World[i][j]==NULL)  {
                 World[i][j]=new Block(1,0);
             }
        }
     }
-    for (int i=0;i<size;i++)  {
+    for (int i=hero_vision;i<size+hero_vision;i++)  {
         for (int j=0;j<int(density_of_blocks*size+0.5);j++)  {
             int pick_non_accesible_block;
             int possible_choices_counter=0;
             int possible_choices[size];
-            for (int k=0;k<size;k++)  {
-                if (!World[i][k]->is_a_market() && (k>size/2+2) && (k<size/2-2))  {
+            for (int k=hero_vision;k<size+hero_vision;k++)  {
+                if (!World[i][k]->is_a_market() && (k>(size+2*hero_vision)/2+2) && (k<(size+2*hero_vision)/2-2))  {
                     possible_choices[possible_choices_counter]=k;
                     possible_choices_counter++;
                 }
@@ -1115,22 +1158,40 @@ void Grid::print_world()  {
 
 void Grid::receive_input()  {
     char input;
-    while((input=getchar())!='q')  {
+    while(!quit_game)  {
+        print_world();
         switch (input)  {
             case 'w' : //move up
-                hero_party->receive_input(input);
+                if (World[hero_party->get_x_position()][hero_party->get_y_position()+1]->is_accessible())  {
+                    hero_party->receive_input(input);
+                }
+                else  {
+                    std::cout << "An object is blocking the path. Please enter an action:";
+                }
                 break;
             case 's'://move down
-                hero_party->receive_input(input);
+                if (World[hero_party->get_x_position()][hero_party->get_y_position()-1]->is_accessible())  {
+                    hero_party->receive_input(input);
+                }
+                else  {
+                    std::cout << "An object is blocking the path. Please enter an action:";
+                }
                 break;
             case 'a'://move left
-                hero_party->receive_input(input);
+                if (World[hero_party->get_x_position()-1][hero_party->get_y_position()]->is_accessible())  {
+                    hero_party->receive_input(input);
+                }
+                else  {
+                    std::cout << "An object is blocking the path. Please enter an action:";
+                }
                 break;
             case 'd'://move right
-                hero_party->receive_input(input);
-                break;
-            case 'm'://display map
-                print_world();
+                if (World[hero_party->get_x_position()+1][hero_party->get_y_position()]->is_accessible())  {
+                    hero_party->receive_input(input);
+                }
+                else  {
+                    std::cout << "An object is blocking the path. Please enter an action:";
+                }
                 break;
             case 'i'://check inventory
                 hero_party->receive_input(input);
@@ -1146,6 +1207,9 @@ void Grid::receive_input()  {
                 break;
             case 'h'://take control of another hero
                 hero_party->receive_input(input);
+                break;
+            case 'q':
+                quit_game=true;
                 break;
             default://no matching key pressed, retry
                 

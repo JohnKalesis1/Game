@@ -17,8 +17,6 @@ int main(int args,char *argv[])  {
 
 static int quit_game=false;
 
-int Market::store_count=1;
-
 float series(int recursion,int agility)  {
     if (recursion==agility)  {
         return 0;
@@ -76,6 +74,9 @@ int get_armor_defense(int level)  {
     return 0;    
 }
 
+int get_gear_price(int level)  {
+    return 0;
+}
 int get_potion_effect(int level,int type)  {
     return 0;    
 }
@@ -305,6 +306,14 @@ void Potion::use(Hero* hero)  {
     hero->receive_buff(type_of_potion,boost);
 }
 
+short Potion::get_type_of_potion()  {
+    return type_of_potion;
+}
+
+int Potion::get_boost()  {
+    return boost;
+}
+
 //////////////////////////////////////////////////////Spell//////////////////////////////////////////////
 
 void Spell::initiate_spell(Monster* monster,int dexterity)  {
@@ -389,9 +398,17 @@ void LivingBeing::restore_life(int amount)  {
 
 //////////////////////////////////////////////////////Hero//////////////////////////////////////////////
 
+Hero::Hero(std::string name,int health,int magic_power_capacity,int strength,int dexterity,int agility,int money)  : LivingBeing(name,health,1), magic_power_capacity(magic_power), magic_power(magic_power), strength(strength), base_strength(strength), base_dexterity(dexterity), dexterity(dexterity), base_agility(agility), agility(agility), money(money)  { 
+    bool two_handed=((rand()%10)<5);
+    weapon=new Weapon(name_pool::get_random_weapon_name(),get_gear_price(1),1,get_weapon_attack(1,two_handed),two_handed);
+    acquire_item(weapon);
+    if (!two_handed)  {
+        armor=new Armor(name_pool::get_random_armor_name(),get_gear_price(1),1,get_armor_defense(1));
+        acquire_item(armor);
+    }
+} 
+
 Hero::~Hero()  {
-    delete armor;
-    delete weapon;
     while (item_box.size()!=0)  {
         std::list<Item*>::iterator it=item_box.begin();
         Item* to_delete=it.operator*();
@@ -529,18 +546,22 @@ void Hero::lose_money(int amount)  {
     money=money-amount;
 }
 
-void Hero::replace_weapon(Weapon* weapon)  {
+bool Hero::replace_weapon(Weapon* weapon)  {
     this->weapon=weapon;
     if ((this->weapon)->Two_handed_weapon())  {
         unequip_armor();
+        return true;
     }
+    return false;
 }
 
-void Hero::replace_armor(Armor* armor)  {
+bool Hero::replace_armor(Armor* armor)  {
     this->armor=armor;
     if (weapon->Two_handed_weapon())  {
         unequip_weapon();
+        return true;
     }
+    return false;
 }
 
 void Hero::unequip_weapon()  {
@@ -642,6 +663,9 @@ void Hero::show_availabe_weapons_and_promt_for_swap()  {
     bool wrong_action=false;
     bool underleveled=false;
     bool already_equipped=false;
+    bool successfully_equipped=false;
+    bool unequipped_armor=false;
+    std::string weapon_equipped;
     while (true)  {
         std::list<Item*>::iterator it=item_box.begin();
         system("clear");
@@ -651,7 +675,7 @@ void Hero::show_availabe_weapons_and_promt_for_swap()  {
         for (int i=0;i<item_box.size();i++)  {
             if (it.operator*()->get_type_of_item()==0)  {
                 Weapon* weapon_candidate=(Weapon*)it.operator*();
-                std::cout << std::to_string(i) <<"." << weapon_candidate->get_name();
+                std::cout << std::to_string(weapons_count+1) <<"." << weapon_candidate->get_name();
                 choices[weapons_count]=weapon_candidate;
                 weapons_count++;
                 if (weapon->get_name().compare(weapon_candidate->get_name())==0)  {
@@ -665,69 +689,81 @@ void Hero::show_availabe_weapons_and_promt_for_swap()  {
                     std::cout <<" Note: Weapon must be used two-handed\n";
                 }
             }
+            std::advance(it,1);
         }
         std::cout << "\nSelect which weapon you want to equip:\n";
         for (int i=0;i<weapons_count;i++)  {
-            std::cout << std::to_string(i)<<"->"<<choices[weapons_count]->get_name();
-            if (weapon->get_name().compare(choices[weapons_count]->get_name())==0)  {
+            std::cout << std::to_string(i+1)<<"->"<<choices[i]->get_name();
+            if (weapon->get_name().compare(choices[i]->get_name())==0)  {
                 std::cout << "(Equipped)";
             }
-            if (choices[weapons_count]->get_lvl_requirement()>level)  {
-                std::cout << "(Level"<<std::to_string(choices[weapons_count]->get_lvl_requirement()) <<"required)";
+            if (choices[i]->get_lvl_requirement()>level)  {
+                std::cout << "(Level"<<std::to_string(choices[i]->get_lvl_requirement()) <<"required)";
             }
             std::cout << '\n';
         }
+        std::cout <<"(Go Back: b) (Quit game: q)\n";
         std::string input;
         if (wrong_action)  {
             std::cout<< "Option not valid. ";
             wrong_action=false;
         }
         if (underleveled)  {
-            std::cout << "Hero does not meet the requirements to use the weapon";
+            std::cout << "Hero does not meet the requirements to use the weapon. ";
             underleveled=false;
         }
         if (already_equipped)  {
-            std::cout<< "Weapon is already eqquiped\n";
+            std::cout<< "Weapon is already eqquiped. ";
             already_equipped=false;
         }
+        if (successfully_equipped)  {
+            if (unequipped_armor)  {
+                std::cout << weapon_equipped<<"(Two-handed) successfully equipped. Armor has been unequipped. ";
+            }
+            else  {
+                std::cout << weapon_equipped<<" successfully equipped. ";
+            }
+            successfully_equipped=false;
+            unequipped_armor=false;
+        }
         std::cout << "Please enter an action:";
-        while (true)  {
-            std::cin >> input; 
-            if (check_number(input))  {
-                int pick=atoi(input.c_str());
-                if (pick<=weapons_count && pick>0)  {
-                    if (choices[pick]->get_lvl_requirement()<=level)  {
-                        if (choices[pick]->get_name().compare(weapon->get_name()))  {
-                            already_equipped=true;
-                            continue;
-                        }
-                        else  {
-                            replace_weapon(choices[pick]);
-                            return;
-                        }
+        std::cin >> input; 
+        if (check_number(input))  {
+            int pick=atoi(input.c_str())-1;
+            if (pick<weapons_count && pick>=0)  {
+                if (choices[pick]->get_lvl_requirement()<=level)  {
+                    if (choices[pick]->get_name().compare(weapon->get_name())==0)  {
+                        already_equipped=true;
+                        continue;
                     }
                     else  {
-                        underleveled=true;
+                        weapon_equipped=choices[pick]->get_name();
+                        unequipped_armor=replace_weapon(choices[pick]);
+                        successfully_equipped=true;
                         continue;
                     }
                 }
                 else  {
-                    wrong_action=true;
+                    underleveled=true;
                     continue;
                 }
             }
             else  {
-                if (input.compare("q")==0)  {
-                    quit_game=true;
-                    return;
-                }
-                else if (input.compare("b")==0)  {
-                    return;
-                }
-                else  {
-                    wrong_action=true;
-                    continue;
-                }
+                wrong_action=true;
+                continue;
+            }
+        }
+        else  {
+            if (input.compare("q")==0)  {
+                quit_game=true;
+                return;
+            }
+            else if (input.compare("b")==0)  {
+                return;
+            }
+            else  {
+                wrong_action=true;
+                continue;
             }
         }
     }
@@ -737,6 +773,9 @@ void Hero::show_availabe_armors_and_promt_for_swap()  {
     bool wrong_action=false;
     bool underleveled=false;
     bool already_equipped=false;
+    bool successfully_equipped=false;
+    bool weapon_unequipped=false;
+    std::string armor_equipped;
     while (true)  {
         std::list<Item*>::iterator it=item_box.begin();
         system("clear");
@@ -746,7 +785,7 @@ void Hero::show_availabe_armors_and_promt_for_swap()  {
         for (int i=0;i<item_box.size();i++)  {
             if (it.operator*()->get_type_of_item()==1)  {
                 Armor* armor_candidate=(Armor*)it.operator*();
-                std::cout << std::to_string(i) <<"." << armor_candidate->get_name();
+                std::cout << std::to_string(armors_count+1) <<"." << armor_candidate->get_name();
                 choices[armors_count]=armor_candidate;
                 armors_count++;
                 if (armor->get_name().compare(armor_candidate->get_name())==0)  {
@@ -757,18 +796,24 @@ void Hero::show_availabe_armors_and_promt_for_swap()  {
                 std::cout <<" Level: "<<armor_candidate->get_lvl_requirement()<<'\n';
                 std::cout <<" Price: "<<armor_candidate->get_price()/2<<'\n';
             }
+            std::advance(it,1);
         }
-        std::cout << "\nSelect which armor you want to equip:\n";
+        std::cout << "\nSelect which armor you want to equip: ";
+        if (weapon->Two_handed_weapon())  {
+            std::cout << "(Be advised, equipping any armor will unequipped your current Two-handed weapon)";
+        }
+        std::cout << '\n';
         for (int i=0;i<armors_count;i++)  {
-            std::cout << std::to_string(i)<<"->"<<choices[armors_count]->get_name();
-            if (armor->get_name().compare(choices[armors_count]->get_name())==0)  {
+            std::cout << std::to_string(i+1)<<"->"<<choices[i]->get_name();
+            if (armor->get_name().compare(choices[i]->get_name())==0)  {
                 std::cout << "(Equipped)";
             }
-            if (choices[armors_count]->get_lvl_requirement()>level)  {
-                std::cout << "(Level"<<std::to_string(choices[armors_count]->get_lvl_requirement()) <<"required)";
+            if (choices[i]->get_lvl_requirement()>level)  {
+                std::cout << "(Level"<<std::to_string(choices[i]->get_lvl_requirement()) <<"required)";
             }
             std::cout << '\n';
         }
+        std::cout <<"(Go Back: b) (Quit game: q)\n";
         std::string input;
         if (wrong_action)  {
             std::cout<< "Option not valid. ";
@@ -782,44 +827,55 @@ void Hero::show_availabe_armors_and_promt_for_swap()  {
             std::cout<< "Armor is already eqquiped. ";
             already_equipped=false;
         }
+        if (successfully_equipped)  {
+            if (weapon_unequipped)  {
+                std::cout << armor_equipped<<" successfully equipped. Two-handed weapon has been unequipped. ";
+            }
+            else  {
+                std::cout << armor_equipped<<" successfully equipped. ";
+            }
+            weapon_unequipped=false;
+            successfully_equipped=false;
+
+        }
         std::cout << "Please enter an action:";
-        while (true)  {
-            std::cin >> input; 
-            if (check_number(input))  {
-                int pick=atoi(input.c_str());
-                if (pick<=armors_count && pick>0)  {
-                    if (choices[pick]->get_lvl_requirement()<=level)  {
-                        if (choices[pick]->get_name().compare(armor->get_name()))  {
-                            already_equipped=true;
-                            continue;
-                        }
-                        else  {
-                            replace_armor(choices[pick]);
-                            return;
-                        }
+        std::cin >> input; 
+        if (check_number(input))  {
+            int pick=atoi(input.c_str())-1;
+            if (pick<armors_count && pick>=0)  {
+                if (choices[pick]->get_lvl_requirement()<=level)  {
+                    if (choices[pick]->get_name().compare(armor->get_name())==0)  {
+                        already_equipped=true;
+                        continue;
                     }
                     else  {
-                        underleveled=true;
+                        armor_equipped=choices[pick]->get_name();
+                        weapon_unequipped=replace_armor(choices[pick]);
+                        successfully_equipped=true;
                         continue;
                     }
                 }
                 else  {
-                    wrong_action=true;
+                    underleveled=true;
                     continue;
                 }
             }
             else  {
-                if (input.compare("q")==0)  {
-                    quit_game=true;
-                    return;
-                }
-                else if (input.compare("b")==0)  {
-                    return;
-                }
-                else  {
-                    wrong_action=true;
-                    continue;
-                }
+                wrong_action=true;
+                continue;
+            }
+        }
+        else  {
+            if (input.compare("q")==0)  {
+                quit_game=true;
+                return;
+            }
+            else if (input.compare("b")==0)  {
+                return;
+            }
+            else  {
+                wrong_action=true;
+                continue;
             }
         }
     }
@@ -839,7 +895,7 @@ void Hero::show_availabe_potions_and_promt_for_use()  {
         for (int i=0;i<item_box.size();i++)  {
             if (it.operator*()->get_type_of_item()==2)  {
                 potion=(Potion*)it.operator*();
-                std::cout << std::to_string(i) <<"." << potion->get_name() <<"(Potion)";
+                std::cout << std::to_string(potions_count+1) <<"." << potion->get_name() <<"(Potion)";
                 potion_choices[potions_count]=potion;
                 potions_count++;
                 std::cout << '\n';
@@ -865,6 +921,7 @@ void Hero::show_availabe_potions_and_promt_for_use()  {
                 }
                 std::cout <<" Level: "<<potion->get_lvl_requirement()<<'\n';
                 std::cout <<" Price: "<<potion->get_price()<<'\n';
+                std::advance(it,1);
             }
         }
         if (potions_count==0)  {
@@ -873,53 +930,54 @@ void Hero::show_availabe_potions_and_promt_for_use()  {
         else  {
             std::cout << "\nSelect which potion you want to use:\n";
             for (int i=0;i<potions_count;i++)  {
-                std::cout << std::to_string(i)<<"->"<<potion_choices[potions_count]->get_name();
-                if (potion_choices[potions_count]->get_lvl_requirement()>level)  {
-                    std::cout << "(Level"<<std::to_string(potion_choices[potions_count]->get_lvl_requirement()) <<"required)";
+                std::cout << std::to_string(i+1)<<"->"<<potion_choices[i]->get_name();
+                if (potion_choices[i]->get_lvl_requirement()>level)  {
+                    std::cout << "(Level"<<std::to_string(potion_choices[i]->get_lvl_requirement()) <<"required)";
                 }
                 std::cout << '\n';
             }
         }
+        std::cout <<"(Go Back: b) (Quit game: q)\n";
         std::string input;
         if (wrong_action)  {
             std::cout<< "Option not valid. ";
             wrong_action=false;
         }
         if (underleveled)  {
-            std::cout << "Hero does not meet the requirements to use the potion";
+            std::cout << "Hero does not meet the requirements to use the potion. ";
             underleveled=false;
         }
         std::cout << "Please enter an action:";
-            std::cin >> input; 
-            if (check_number(input))  {
-                int pick=atoi(input.c_str());
-                if (pick<=potions_count && pick>0)  {
-                    if (potion_choices[pick]->get_lvl_requirement()<=level)  {
-                        use_potion(potion_choices[pick]);
-                        return;
-                    }
-                    else  {
-                        underleveled=true;
-                    }
+        std::cin >> input; 
+        if (check_number(input))  {
+            int pick=atoi(input.c_str())-1;
+            if (pick<potions_count && pick>=0)  {
+                if (potion_choices[pick]->get_lvl_requirement()<=level)  {
+                    use_potion(potion_choices[pick]);
+                    return;
                 }
                 else  {
-                    wrong_action=true;
-                    continue;
+                    underleveled=true;
                 }
             }
             else  {
-                if (input.compare("q")==0)  {
-                    quit_game=true;
-                    return;
-                }
-                else if (input.compare("b")==0)  {
-                    return;
-                }
-                else  {
-                    wrong_action=true;
-                    continue;
-                }
+                wrong_action=true;
+                continue;
             }
+        }
+        else  {
+            if (input.compare("q")==0)  {
+                quit_game=true;
+                return;
+            }
+            else if (input.compare("b")==0)  {
+                return;
+            }
+            else  {
+                wrong_action=true;
+                continue;
+            }
+        }
     }
 }
 
@@ -1240,9 +1298,7 @@ int Fight::get_current_round()  {
 
 //////////////////////////////////////////////////////Market////////////////////////////////////////
 
-Market::Market(int number_of_wares_to_generate)  {
-    store_number=store_count;
-    store_count++;
+Market::Market(int number_of_wares_to_generate) : visited(false) {
     while(number_of_wares_to_generate-->0)  {
         bool spell_or_item=rand()%2;
         if (spell_or_item)  {
@@ -1300,48 +1356,62 @@ Market::~Market()  {
     }
 }
 
-void Market::buy_item(std::string item_name,Hero* hero)  {
+std::string Market::buy_item(std::string item_name,Hero* hero)  {
     std::list<Item*>::iterator it=items.begin();
     for (int i=0;i<items.size();i++)  {
         if (it.operator*()->get_name().compare(item_name)==0)  {
             hero->lose_money(it.operator*()->get_price());
             hero->acquire_item(it.operator*());
+            std::string to_return=it.operator*()->get_name();
             items.erase(it);
+            return to_return;
         }
         else  {
             std::advance(it,1);
         }
     }
+    return NULL;
 }
 
-void Market::sell_item(std::string item_name,Hero* hero)  {
+std::string Market::sell_item(std::string item_name,Hero* hero)  {
     Item* item=hero->remove_item(item_name);
     hero->increase_wealth(item->get_price()/2);
     items.insert(items.begin(),item);
+    return item->get_name();
 }
 
-void Market::buy_spell(std::string spell_name,Hero* hero)  {
+std::string Market::buy_spell(std::string spell_name,Hero* hero)  {
     std::list<Spell*>::iterator it=spells.begin();
     for (int i=0;i<spells.size();i++)  {
         if (it.operator*()->get_name().compare(spell_name)==0)  {
             hero->lose_money(it.operator*()->get_price());
             hero->acquire_spell(it.operator*());
+            std::string to_return=it.operator*()->get_name();
+            spells.erase(it);
+            return to_return;
         }
         else  {
             std::advance(it,1);
         }
     }
+    return NULL;
 }
 
-void Market::sell_spell(std::string spell_name,Hero* hero)  {
+std::string Market::sell_spell(std::string spell_name,Hero* hero)  {
     Spell* spell=hero->remove_spell(spell_name);
     hero->increase_wealth(spell->get_price()/2);
     spells.insert(spells.begin(),spell);
+    return spell->get_name();
 }
 
 void Market::browse_wares(Hero_Party* hero_party)  {
+    visited=true;
     bool buy_or_sell=1;
     bool item_or_spell=1;
+    bool wrong_action=false;
+    bool not_enough_money=false;
+    bool succesful_purchase=false;
+    std::string item_bought;
     std::string input;
     while (true)  {
         if (buy_or_sell)  {
@@ -1355,7 +1425,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 for (int i=0;i<items.size();i++)  {
                     if (it.operator*()->get_type_of_item()==0)  {
                         item=it.operator*();
-                        std::cout << std::to_string(i) <<"." << item->get_name()<<"(Weapon)";
+                        std::cout << std::to_string(i+1) <<"." << item->get_name()<<"(Weapon)";
                         item_choices[items_count]=item;
                         items_count++;
                         std::cout << '\n';
@@ -1368,7 +1438,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                     }
                     if (it.operator*()->get_type_of_item()==1)  {
                         item=it.operator*();
-                        std::cout << std::to_string(i) <<"." << item->get_name()<<"(Armor)";
+                        std::cout << std::to_string(i+1) <<"." << item->get_name()<<"(Armor)";
                         item_choices[items_count]=item;
                         items_count++;
                         std::cout << '\n';
@@ -1378,7 +1448,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                     }
                     if (it.operator*()->get_type_of_item()==2)  {
                         item=it.operator*();
-                        std::cout << std::to_string(i) <<"." << item->get_name() <<"(Potion)";
+                        std::cout << std::to_string(i+1) <<"." << item->get_name() <<"(Potion)";
                         item_choices[items_count]=item;
                         items_count++;
                         std::cout << '\n';
@@ -1405,14 +1475,33 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         std::cout <<" Level: "<<item->get_lvl_requirement()<<'\n';
                         std::cout <<" Price: "<<item->get_price()<<'\n';
                     }
+                    std::advance(it,1);
                 }
-                std::cout << "\nSelect the item you want to buy:\n";
-                for (int i=0;i<items_count;i++)  {
-                    std::cout << std::to_string(i)<<"->"<<item_choices[items_count]->get_name();
-                    if (item_choices[items_count]->get_lvl_requirement()>hero_party->get_heroes_level())  {
-                        std::cout << "(Level"<<std::to_string(item_choices[items_count]->get_lvl_requirement()) <<"required)";
+                if (items_count==0)  {
+                    std::cout << "No items available for purchase. ";
+                }
+                else  {
+                    std::cout << "\nSelect the item you want to buy:\n";
+                    for (int i=0;i<items_count;i++)  {
+                        std::cout << std::to_string(i+1)<<"->"<<item_choices[items_count]->get_name();
+                        if (item_choices[items_count]->get_lvl_requirement()>hero_party->get_heroes_level())  {
+                            std::cout << "(Level"<<std::to_string(item_choices[items_count]->get_lvl_requirement()) <<"required)";
+                        }
+                        std::cout << '\n';
                     }
                     std::cout << '\n';
+                }
+                if (wrong_action)  {
+                    std::cout<< "Option not valid. ";
+                    wrong_action=false;
+                }
+                if (not_enough_money)  {
+                    std::cout << "Not enough money for the transaction. ";
+                    not_enough_money=false;
+                }
+                if (succesful_purchase)  {
+                    std::cout << item_bought<< " acquired. ";
+                    succesful_purchase=false;
                 }
                 std::string input;
                 std::cout << "Please enter an action:";
@@ -1421,13 +1510,17 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                     if (check_number(input))  {
                         int pick=atoi(input.c_str());
                         if (pick<=items_count && pick>0)  {
-                            if (item_choices[pick]->get_lvl_requirement()<=hero_party->get_heroes_level())  {
-                                buy_item(item_choices[pick]->get_name(),hero_party->get_hero_in_control());
-                                return;
+                            if (item_choices[pick]->get_price()<=hero_party->get_hero_in_control()->get_wealth())  {
+                                item_bought=buy_item(item_choices[pick]->get_name(),hero_party->get_hero_in_control());
+                                succesful_purchase=true;
+
+                            }
+                            else  {
+                                not_enough_money=true;
                             }
                         }
                         else  {
-                            std::cout<< "Option not valid. Please enter an action:\n";
+                            wrong_action=true;
                             continue;
                         }
                     }
@@ -1439,8 +1532,16 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         else if (input.compare("b")==0)  {
                             return;
                         }
+                        else if (input.compare("c")==0)  {
+                            item_or_spell=false;
+                            continue;
+                        }
+                        else if (input.compare("t")==0)  {
+                            buy_or_sell=false;
+                            continue;
+                        }
                         else  {
-                            std::cout<< "Option not valid. Please enter an action:\n";
+                            wrong_action=true;
                             continue;
                         }
                     }
@@ -1456,7 +1557,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 for (int i=0;i<spells.size();i++)  {
                     if (it2.operator*()->get_type_of_spell()==0)  {
                         spell=it2.operator*();
-                        std::cout << std::to_string(i) <<"." << spell->get_name()<<"(Ligthing Spell)";
+                        std::cout << std::to_string(i+1) <<"." << spell->get_name()<<"(Ligthing Spell)";
                         spell_choices[spells_count]=spell;
                         spells_count++;
                         std::cout << '\n';
@@ -1467,7 +1568,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                     }
                     if (it2.operator*()->get_type_of_spell()==1)  {
                         spell=it2.operator*();
-                        std::cout << std::to_string(i) <<"." << spell->get_name()<<"(Fire Spell)";
+                        std::cout << std::to_string(i+1) <<"." << spell->get_name()<<"(Fire Spell)";
                         spell_choices[spells_count]=spell;
                         spells_count++;
                         std::cout << '\n';
@@ -1478,7 +1579,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                     }
                     if (it2.operator*()->get_type_of_spell()==2)  {
                         spell=it2.operator*();
-                        std::cout << std::to_string(i) <<"." << spell->get_name() <<"(Ice Spell)";
+                        std::cout << std::to_string(i+1) <<"." << spell->get_name() <<"(Ice Spell)";
                         spell_choices[spells_count]=spell;
                         spells_count++;
                         std::cout << '\n';
@@ -1487,16 +1588,34 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         std::cout <<" Level: "<<spell->get_lvl_requirement()<<'\n';
                         std::cout <<" Price: "<<spell->get_price()<<'\n';
                     }
+                    std::advance(it2,1);
                 }
-                std::cout << "\nSelect which spell you want to buy:\n";
-                for (int i=0;i<spells_count;i++)  {
-                    std::cout << std::to_string(i)<<"->"<<spell_choices[spells_count]->get_name();
-                    if (spell_choices[spells_count]->get_lvl_requirement()>hero_party->get_heroes_level())  {
-                        std::cout << "(Level"<<std::to_string(spell_choices[spells_count]->get_lvl_requirement()) <<"required)";
+                if (spells_count==0)  {
+                    std::cout << "No spells available for purchase. ";
+                }
+                else  {
+                    std::cout << "\nSelect which spell you want to buy:\n";
+                    for (int i=0;i<spells_count;i++)  {
+                        std::cout << std::to_string(i+1)<<"->"<<spell_choices[spells_count]->get_name();
+                        if (spell_choices[spells_count]->get_lvl_requirement()>hero_party->get_heroes_level())  {
+                            std::cout << "(Level"<<std::to_string(spell_choices[spells_count]->get_lvl_requirement()) <<"required)";
+                        }
+                        std::cout << '\n';
                     }
-                    std::cout << '\n';
                 }
                 std::string input;
+                if (wrong_action)  {
+                    std::cout<< "Option not valid. ";
+                    wrong_action=false;
+                }
+                if (not_enough_money)  {
+                    std::cout << "Not enough money for the transaction. ";
+                    not_enough_money=false;
+                }
+                if (succesful_purchase)  {
+                    std::cout << item_bought<< " acquired. ";
+                    succesful_purchase=false;
+                }
                 std::cout << "Please enter an action:";
                 while (true)  {
                     std::cin >> input; 
@@ -1504,12 +1623,13 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         int pick=atoi(input.c_str());
                         if (pick<=spells_count && pick>0)  {
                             if (spell_choices[pick]->get_lvl_requirement()<=hero_party->get_heroes_level())  {
-                                buy_spell(spell_choices[pick]->get_name(),hero_party->get_hero_in_control());
-                                return;
+                                item_bought=buy_spell(spell_choices[pick]->get_name(),hero_party->get_hero_in_control());
+                                succesful_purchase=true;
+                                continue;
                             }
                         }
                         else  {
-                            std::cout<< "Option not valid. Please enter an action:\n";
+                            wrong_action=true;
                             continue;
                         }
                     }
@@ -1521,8 +1641,16 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         else if (input.compare("b")==0)  {
                             return;
                         }
+                        else if (input.compare("c")==0)  {
+                            item_or_spell=true;
+                            continue;
+                        }
+                        else if (input.compare("t")==0)  {
+                            buy_or_sell=false;
+                            continue;
+                        }
                         else  {
-                            std::cout<< "Option not valid. Please enter an action:\n";
+                            wrong_action=true;
                             continue;
                         }
                     }
@@ -1532,7 +1660,6 @@ void Market::browse_wares(Hero_Party* hero_party)  {
         else  {
 
         }
-        std::cin >> input;
     }
 
 }
@@ -1540,9 +1667,8 @@ void Market::browse_wares(Hero_Party* hero_party)  {
 void Market::receive_input(char input)  {
 
 }
-
-int Market::get_store_number()  {
-    return store_number;
+bool Market::has_been_visited()  {
+    return visited;
 }
 
 //////////////////////////////////////////////////////Block////////////////////////////////////////
@@ -1591,8 +1717,8 @@ Market& Block::access_market()  {
     return *market;
 }
 
-int Block::get_store_number()  {
-    return market->get_store_number();
+bool Block::has_been_visited()  {
+    return market->has_been_visited();
 }
 //////////////////////////////////////////////////////Grid////////////////////////////////////////
 
@@ -1603,7 +1729,7 @@ Grid::Grid(int size,int number_of_heroes) : size(size), hero_vision(5) {
     int market_x_pos;
     int market_y_pos;
     int number_of_areas=(size/4);
-    float density_of_blocks=0.2;
+    float density_of_blocks=0.4;
     hero_party=new Hero_Party((size+2*hero_vision)/2,(size+2*hero_vision)/2,number_of_heroes);
     World=new Block**[size+2*hero_vision];
     for (int i=0;i<size+2*hero_vision;i++)  {
@@ -1640,13 +1766,13 @@ Grid::Grid(int size,int number_of_heroes) : size(size), hero_vision(5) {
             int possible_choices_counter=0;
             int possible_choices[size];
             for (int k=hero_vision;k<size+hero_vision;k++)  {
-                if (!World[i][k]->is_a_market())  {
+                if (!World[i][k]->is_a_market() && (i!=hero_party->get_y_position() || k!=hero_party->get_x_position()))  {
                     possible_choices[possible_choices_counter]=k;
                     possible_choices_counter++;
                 }
             }
             pick_non_accesible_block=rand()%possible_choices_counter;
-            World[i][pick_non_accesible_block]->set_to_non_accessible();
+            World[i][possible_choices[pick_non_accesible_block]]->set_to_non_accessible();
         }
     }
 }
@@ -1662,7 +1788,7 @@ Grid::~Grid()  {
     delete[] World;
 }
 
-void Grid::print_world(bool blocked_passage)  {
+void Grid::print_world(bool blocked_passage,bool wrong_action)  {
     int centre_x=hero_party->get_x_position();
     int centre_y=hero_party->get_y_position();
     system("clear");
@@ -1686,7 +1812,14 @@ void Grid::print_world(bool blocked_passage)  {
                 }
                 if (World[i][j]->is_accessible())  {
                     if (World[i][j]->is_a_market())  {
-                        std::cout << " Store"<< World[i][j]->get_store_number()<< " |";
+                        std::cout << " Store";
+                        if (World[i][j]->has_been_visited())  {
+                            std::cout<<" ";
+                        }
+                        else  {
+                            std::cout <<"!";
+                        }
+                        std::cout << " |";
                     }
                     else  {
                         std::cout << "        |";
@@ -1710,7 +1843,9 @@ void Grid::print_world(bool blocked_passage)  {
     std::cout << "(Equip Armor: x) ";
     std::cout << "(Use Potion: c) \n";
     std::cout << " (Display Stats: u) ";
-    std::cout << "(Access Market: m) ";
+    if (World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
+        std::cout << "(Access Market: m) ";
+    }
     if (hero_party->get_number_of_heroes()>1)  {
         std::cout << "(Swap hero: h) ";
     }
@@ -1718,15 +1853,20 @@ void Grid::print_world(bool blocked_passage)  {
     if (blocked_passage)  {
         std::cout << "An object is blocking the path.";
     }
+    if (wrong_action)  {
+        std::cout << "Option not valid. ";
+    }
     std::cout << "Please enter an action:\n";
 }
 
 void Grid::receive_input()  {
     char input;
     bool blocked_passage=false;
+    bool wrong_action=false;
     while(!quit_game)  {
-        print_world(blocked_passage);
+        print_world(blocked_passage,wrong_action);
         blocked_passage=false;
+        wrong_action=false;
         std::cin >> input;
         switch (input)  {
             case 'w' : //move up
@@ -1783,12 +1923,15 @@ void Grid::receive_input()  {
                 if (World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
                     World[hero_party->get_y_position()][hero_party->get_x_position()]->access_market().browse_wares(hero_party);
                 }
+                else  {
+                    wrong_action=true;
+                }
                 break;
             case 'q':
                 quit_game=true;
                 break;
             default://no matching key pressed, retry
-                
+                wrong_action=true;
                 break;
         }
     }

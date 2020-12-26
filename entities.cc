@@ -1458,7 +1458,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         spell=it2.operator*();
                         std::cout << std::to_string(i) <<"." << spell->get_name()<<"(Ligthing Spell)";
                         spell_choices[spells_count]=spell;
-                        spells_count++
+                        spells_count++;
                         std::cout << '\n';
                         std::cout <<" Average Damage: "<<spell->get_power()<<'\n';
                         std::cout << "Effect: Reduced evasion chance by "<<spell->get_effect().get_percentage() <<" for "<< spell->get_effect().get_duration() <<" rounds\n";
@@ -1469,7 +1469,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         spell=it2.operator*();
                         std::cout << std::to_string(i) <<"." << spell->get_name()<<"(Fire Spell)";
                         spell_choices[spells_count]=spell;
-                        spells_count++
+                        spells_count++;
                         std::cout << '\n';
                         std::cout <<" Average Damage: "<<spell->get_power()<<'\n';
                         std::cout << "Effect: Reduced defense by "<<spell->get_effect().get_percentage() <<" for "<< spell->get_effect().get_duration() <<" rounds\n";
@@ -1480,7 +1480,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         spell=it2.operator*();
                         std::cout << std::to_string(i) <<"." << spell->get_name() <<"(Ice Spell)";
                         spell_choices[spells_count]=spell;
-                        spells_count++
+                        spells_count++;
                         std::cout << '\n';
                         std::cout << "Average Damage: "<<spell->get_power() <<'\n';
                         std::cout << "Effect: Reduced attack by "<<spell->get_effect().get_percentage() <<" for "<< spell->get_effect().get_duration() <<" rounds\n";

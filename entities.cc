@@ -383,7 +383,7 @@ int LivingBeing::get_health_capacity()  {
 }
 
 int LivingBeing::get_level()  {
-    return health;
+    return level;
 }
 
 void LivingBeing::restore_life(int amount)  {
@@ -451,6 +451,14 @@ int Hero::get_wealth()  {
 
 int Hero::get_experience()  {
     return experience;
+}
+
+Weapon* Hero::get_equipped_weapon()  {
+    return weapon;
+}
+
+Armor* Hero::get_equipped_armor()  {
+    return armor;
 }
 
 std::list<Item*>& Hero::get_item_box()  {
@@ -1598,6 +1606,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 system("clear");
                 Item* item_choices[items.size()];
                 int items_count=0;
+                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name()<< " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n';                 
                 std::cout << "Items:\n";
                 Item* item;
                 for (int i=0;i<items.size();i++)  {
@@ -1669,7 +1678,11 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                     }
                     std::cout << '\n';
                 }
-                std::cout <<"(Spells category: c) (Sell items: t) (Go Back: b) (Quit game: q)\n";
+                std::cout <<"(Spells category: c) (Sell items: t) "" (Go Back: b) ";
+                if (hero_party->get_number_of_heroes()>1)  {
+                    std::cout << "(Switch hero: h) ";
+                }
+                std::cout<<"(Quit game: q)\n";
                 if (wrong_action)  {
                     std::cout<< "Option not valid. ";
                     wrong_action=false;
@@ -1718,6 +1731,14 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         buy_or_sell=false;
                         continue;
                     }
+                    else if (input.compare("h")==0)//take control of another hero
+                        if (hero_party->get_number_of_heroes()>1)  {
+                            hero_party->receive_input('h');
+                            continue ;
+                        }
+                        else  {
+                            wrong_action=true;
+                        }
                     else  {
                         wrong_action=true;
                         continue;
@@ -1729,6 +1750,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 Spell* spell_choices[spells.size()];
                 system("clear");
                 int spells_count=0;
+                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name()<< " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n'; 
                 std::cout << "Spells:\n";
                 Spell* spell;
                 for (int i=0;i<spells.size();i++)  {
@@ -1775,13 +1797,17 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                     for (int i=0;i<spells_count;i++)  {
                         std::cout << i+1 <<"->"<<spell_choices[spells_count]->get_name();
                         if (spell_choices[spells_count]->get_lvl_requirement()>hero_party->get_heroes_level())  {
-                            std::cout << "(Level"<<std::to_string(spell_choices[spells_count]->get_lvl_requirement()) <<"required)";
+                            std::cout << "(Level"<<spell_choices[spells_count]->get_lvl_requirement() <<"required)";
                         }
                         std::cout << '\n';
                     }
                 }
                 std::string input;
-                std::cout <<"(Items category: c) (Sell spells: t) (Go Back: b) (Quit game: q)\n";
+                std::cout <<"(Items category: c) (Sell spells: t) (Go Back: b) ";
+                if (hero_party->get_number_of_heroes()>1)  {
+                    std::cout << "(Switch hero: h) ";
+                }
+                std::cout<<"(Quit game: q)\n";
                 if (wrong_action)  {
                     std::cout<< "Option not valid. ";
                     wrong_action=false;
@@ -1797,8 +1823,8 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 std::cout << "Please enter an action:";
                 std::cin >> input; 
                 if (check_number(input))  {
-                    int pick=atoi(input.c_str());
-                    if (pick<=spells_count && pick>0)  {
+                    int pick=atoi(input.c_str())-1;
+                    if (pick<spells_count && pick>=0)  {
                         if (spell_choices[pick]->get_lvl_requirement()<=hero_party->get_heroes_level())  {
                             merchandise_traded=buy_spell(spell_choices[pick]->get_name(),hero_party->get_hero_in_control());
                             successful_purchase=true;
@@ -1826,6 +1852,14 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         buy_or_sell=false;
                         continue;
                     }
+                    else if (input.compare("h")==0)//take control of another hero
+                        if (hero_party->get_number_of_heroes()>1)  {
+                            hero_party->receive_input('h');
+                            continue ;
+                        }
+                        else  {
+                            wrong_action=true;
+                        }
                     else  {
                         wrong_action=true;
                         continue;
@@ -1839,6 +1873,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 system("clear");
                 Item* item_choices[hero_party->get_hero_in_control()->get_item_box().size()];
                 int items_count=0;
+                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name()<< " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n'; 
                 std::cout << "Items:\n";
                 Item* item;
                 for (int i=0;i<hero_party->get_hero_in_control()->get_item_box().size();i++)  {
@@ -1898,11 +1933,15 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 }
                 std::cout << "\nSelect which item you want to sell:\n";
                 for (int i=0;i<items_count;i++)  {
-                    std::cout << i+1 <<"->"<<item_choices[items_count]->get_name();
-                    std::cout << "("<<item_choices[items_count]->get_lvl_requirement() <<" gold)";
+                    std::cout << i+1 <<"->"<<item_choices[i]->get_name();
+                    std::cout << "("<<item_choices[i]->get_lvl_requirement() <<" gold)";
                     std::cout << '\n';
                 }
-                std::cout <<"(Spells category: c) (Buy items: t) (Go Back: b) (Quit game: q)\n";
+                std::cout <<"(Spells category: c) (Buy items: t) (Go Back: b) ";
+                if (hero_party->get_number_of_heroes()>1)  {
+                    std::cout << "(Switch hero: h) ";
+                }
+                std::cout<<"(Quit game: q)\n";
                 if (wrong_action)  {
                     std::cout<< "Option not valid. ";
                     wrong_action=false;
@@ -1919,8 +1958,8 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 std::cout << "Please enter an action:";
                 std::cin >> input;
                 if (check_number(input))  {
-                    int pick=atoi(input.c_str());
-                    if (pick<=items_count && pick>0)  {
+                    int pick=atoi(input.c_str())-1;
+                    if (pick<items_count && pick>=0)  {
                         if (item_choices[pick]->get_name().compare(hero_party->get_hero_in_control()->get_equipped_weapon()->get_name())==0)  {
                             tried_to_sell_equipped_gear=true;
                             continue;
@@ -1951,6 +1990,14 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                     else if (input.compare("t")==0)  {
                         buy_or_sell=true;
                     }
+                    else if (input.compare("h")==0)//take control of another hero
+                        if (hero_party->get_number_of_heroes()>1)  {
+                            hero_party->receive_input('h');
+                            continue ;
+                        }
+                        else  {
+                            wrong_action=true;
+                        }
                     else  {
                         wrong_action=true;
                         continue;
@@ -1962,6 +2009,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 Spell* spell_choices[hero_party->get_hero_in_control()->get_spells().size()];
                 system("clear");
                 int spells_count=0;
+                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name()<< " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n'; 
                 std::cout << "Spells:\n";
                 Spell* spell;
                 for (int i=0;i<hero_party->get_hero_in_control()->get_spells().size();i++)  {
@@ -2011,7 +2059,11 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         std::cout << '\n';
                     }
                 }
-                std::cout <<"(Items category: c) (Buy spells: t) (Go Back: b) (Quit game: q)\n";
+                std::cout <<"(Items category: c) (Buy spells: t) (Go Back: b) ";
+                if (hero_party->get_number_of_heroes()>1)  {
+                    std::cout << "(Switch hero: h) ";
+                }
+                std::cout<<"(Quit game: q)\n";
                 std::string input;
                 if (wrong_action)  {
                     std::cout<< "Option not valid. ";
@@ -2026,9 +2078,15 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 if (check_number(input))  {
                     int pick=atoi(input.c_str());
                     if (pick<=spells_count && pick>0)  {
-                        merchandise_traded=sell_spell(spell_choices[pick]->get_name(),hero_party->get_hero_in_control());
-                        successful_sale=true;
-                        continue;
+                        if (spell_choices[pick]->get_name().compare(hero_party->get_hero_in_control()->get_equipped_armor()->get_name())==0)  {
+                            tried_to_sell_equipped_gear;
+                            continue;
+                        }
+                        else  {
+                            merchandise_traded=sell_spell(spell_choices[pick]->get_name(),hero_party->get_hero_in_control());
+                            successful_sale=true;
+                            continue;
+                        }
                     }
                     else  {
                         wrong_action=true;
@@ -2050,6 +2108,14 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                     else if (input.compare("t")==0)  {
                         buy_or_sell=true;
                     }
+                    else if (input.compare("h")==0)//take control of another hero
+                        if (hero_party->get_number_of_heroes()>1)  {
+                            hero_party->receive_input('h');
+                            continue ;
+                        }
+                        else  {
+                            wrong_action=true;
+                        }
                     else  {
                         wrong_action=true;
                         continue;
@@ -2244,7 +2310,7 @@ void Grid::print_world(bool blocked_passage,bool wrong_action)  {
         std::cout << "(Access Market: m) ";
     }
     if (hero_party->get_number_of_heroes()>1)  {
-        std::cout << "(Swap hero: h) ";
+        std::cout << "(Switch hero: h) ";
     }
     std::cout << "(Quit Game: q) \n";
     if (blocked_passage)  {
@@ -2311,7 +2377,12 @@ void Grid::receive_input()  {
                 hero_party->receive_input(input);
                 break;
             case 'h'://take control of another hero
-                hero_party->receive_input(input);
+                if (hero_party->get_number_of_heroes()>1)  {
+                    hero_party->receive_input(input);
+                }
+                else  {
+                    wrong_action=true;
+                }
                 break;
             case 'u'://display hero stats
                 hero_party->receive_input(input);

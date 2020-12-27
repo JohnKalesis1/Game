@@ -1403,7 +1403,7 @@ void Hero_Party::prepare_for_next_round()  {
     }
 }
 
-bool Hero_Party::check_fighting_condition()  {
+bool Hero_Party::in_fighting_condition()  {
     bool to_return=0;
     for (int i=0;i<heroes.size();i++)  {
         to_return=to_return || (heroes.at(i)->get_health()>0);
@@ -1543,11 +1543,13 @@ void Monster_Party::prepare_for_next_round()  {
 
 void Monster_Party::attack_heroes(Hero_Party& Hero_Party)  {
     for (int i=0;i<monsters.size();i++)  {
-        monsters.at(i)->attack(Hero_Party.get_target(rand()%monsters.size()));
+        if (monsters.at(i)->get_health()>0)  {
+            monsters.at(i)->attack(Hero_Party.get_target(rand()%monsters.size()));
+        }
     }
 }
 
-bool Monster_Party::check_fighting_condition()  {
+bool Monster_Party::in_fighting_condition()  {
     bool to_return=0;
     for (int i=0;i<monsters.size();i++)  {
         to_return=to_return || (monsters.at(i)->get_health()>0);
@@ -1572,8 +1574,21 @@ void Monster_Party::victory()  {
 
 //////////////////////////////////////////////////////Fight////////////////////////////////////////
 
-Fight::Fight(Hero_Party* hero_party) : round_count(1), heroes_make_the_first_move(rand()%2), hero_party(hero_party)  {
+Fight::Fight(Hero_Party* hero_party) : round_count(1), hero_party(hero_party)  {
     monster_party=new Monster_Party(hero_party->get_heroes_level(),hero_party->get_number_of_heroes());
+    while (true)  {
+        heroes_turn();
+        monsters_turn();
+        if (!hero_party->in_fighting_condition())  {
+            hero_party->defeat();
+            break ;
+        }
+        else if (!monster_party->in_fighting_condition())  {
+            hero_party->victory();
+            break ;
+        }
+        next_round();
+    }
 }
 
 void Fight::monsters_turn()  {
@@ -1581,17 +1596,114 @@ void Fight::monsters_turn()  {
 }
 
 void Fight::heroes_turn()  {
-    
+    while (true)  {
+        
+    }
+}
+
+void Fight::print_battle(std::string message)  {
+    std  ::string Dragon_components[11]={
+    "       ||       ||       ",
+    "       |||_____|||       ",
+    "         ||~ ~||         ",
+    "   ''|    |||||    |''   ",
+    "     ||  (-----)  ||     ",
+    "      ||(-------)||      ",
+    "       (---------)       ",
+    "      (-----------)      ",
+    "       (---------)       ",
+    "        (-------)        ",
+    "          ^   ^          "};
+    std::string Exoskeleton[11]={
+    "           ^  ^          ",        
+    "          (*--*)         ",
+    "     ______||||_____     ",
+    "{|  {    o     o    }  |}",
+    "{|==={             }===|}",
+    "      {    ---    }      ",
+    "       {   ---   }       ",
+    "        {  ---  }        ",
+    "          |   |          ",
+    "          |   |          ",
+    "         _|   |_         "};
+    std::string Spirit[11]={
+    "  {                 }    ",
+    "   {}{}         {}{}     ",
+    "      |_________|        ",
+    "       || ^-^ ||         ",
+    "        ||__||           ",
+    "          ||             ",
+    "         ||              ",
+    "        ||               ",
+    "         ||      ||==>   ",
+    "          ||    ||       ",
+    "           ||==||        ",};    
+    std::string Sorcerer[11]={
+    "           |||           ",
+    "          |||||          ",
+    "      ___|||||||___      ",
+    "         (o   o)         ",
+    "    (#)   +++++   (#)    ",
+    "     |    |+++|    |     ",
+    "     ||---||+||---||     ",
+    "          |||||          ",
+    "           | |           ",
+    "           | |           ",
+    "           & &           "};
+    std::string Warrior[11]={
+    "         ^     ^         ",
+    "         |^___^|         ",
+    "       <=|||||||=>       ",
+    "          {* *}          ",
+    "           |||           ",
+    "     /==={|||||}====#}   ",
+    "     =#}  {|||}          ",
+    "           |||           ",
+    "          {| |}          ",
+    "         {|   |}         ",
+    "          &   &          "};
+    std::string Palading[11]={
+    "         |||+|||          ",
+    "         |||||||          ",
+    "         |(^ ^)|          ",
+    "    {#}    |||    {#}     ",
+    "    {|    | | |    |}     ",
+    "    {|===| +|  |===|}     ",
+    "        |   |   |         ",
+    "       |    |    |        ",
+    "      |___________|       ",
+    "         {|   |}          ",
+    "          &   &           "};
+    std::string Dead_Foe[11]={
+    "                          ",
+    "                          ",
+    "                          ",
+    "         _______          ",
+    "         [X   X]          ",
+    "          [---]           ",
+    "           |||            ",
+    "            O             ",
+    "            o             ",
+    "                          ",
+    "                          "};
+    std::string Dead_Friendly[11]={
+    "                          ",
+    "                          ",
+    "          _____           ",
+    "         (     )          ",
+    "        ( o   o )         ",
+    "         | ~~~ |          ",
+    "          |||||           ",
+    "           (O)            ",
+    "            O             ",
+    "            o             ",
+    "                          "};
 }
 
 void Fight::next_round()  {
     monster_party->prepare_for_next_round();
     hero_party->prepare_for_next_round();
     round_count++;
-}
-
-int Fight::get_current_round()  {
-    return round_count;
 }
 
 //////////////////////////////////////////////////////Market////////////////////////////////////////
@@ -2269,16 +2381,6 @@ Block::~Block()  {
     }
 }
 
-bool Block::fight_triggered()  {
-    float random_float=(float)rand()/(float)RAND_MAX;
-    if (random_float<=get_encounter_chance())  {
-        return true;
-    }
-    else  {
-        return false;
-    }
-}
-
 bool Block::is_accessible()  {
     return accessible;
 }
@@ -2371,6 +2473,16 @@ Grid::~Grid()  {
     delete[] World;
 }
 
+bool Grid::fight_triggered()  {
+    short dice=rand()%7;
+    if (dice==0)  {
+        return true;
+    }
+    else  {
+        return false;
+    }
+}
+
 void Grid::print_world(bool blocked_passage,bool wrong_action)  {
     int centre_x=hero_party->get_x_position();
     int centre_y=hero_party->get_y_position();
@@ -2434,7 +2546,7 @@ void Grid::print_world(bool blocked_passage,bool wrong_action)  {
         std::cout << "(Access Market: m) ";
     }
     if (hero_party->get_number_of_heroes()>1)  {
-        std::cout << "(Switch hero: h) ";
+        std::cout << "(Switch hero: h) "; 
     }
     std::cout << "(Quit Game: q) \n";
     if (blocked_passage)  {
@@ -2460,6 +2572,11 @@ void Grid::receive_input()  {
             case 'w' : //move up
                 if (World[hero_party->get_y_position()-1][hero_party->get_x_position()]->is_accessible())  {
                     hero_party->receive_input(actual_input);
+                    if (!World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
+                        if (fight_triggered())  {
+                            fight=new Fight(hero_party);
+                        }
+                    }
                 }
                 else  {
                     blocked_passage=true;
@@ -2468,6 +2585,11 @@ void Grid::receive_input()  {
             case 's'://move down
                 if (World[hero_party->get_y_position()+1][hero_party->get_x_position()]->is_accessible())  {
                     hero_party->receive_input(actual_input);
+                    if (!World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
+                        if (fight_triggered())  {
+                            fight=new Fight(hero_party);
+                        }
+                    }
                 }
                 else  {
                     blocked_passage=true;
@@ -2476,6 +2598,11 @@ void Grid::receive_input()  {
             case 'a'://move left
                 if (World[hero_party->get_y_position()][hero_party->get_x_position()-1]->is_accessible())  {
                     hero_party->receive_input(actual_input);
+                    if (!World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
+                        if (fight_triggered())  {
+                            fight=new Fight(hero_party);
+                        }
+                    }
                 }
                 else  {
                     blocked_passage=true;
@@ -2484,6 +2611,11 @@ void Grid::receive_input()  {
             case 'd'://move right
                 if (World[hero_party->get_y_position()][hero_party->get_x_position()+1]->is_accessible())  {
                     hero_party->receive_input(actual_input);
+                    if (!World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
+                        if (fight_triggered())  {
+                            fight=new Fight(hero_party);
+                        }
+                    }
                 }
                 else  {
                     blocked_passage=true;

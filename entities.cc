@@ -17,6 +17,16 @@ int main(int args,char *argv[])  {
 
 static int quit_game=false;
 
+int count_digit(int number)  {
+    int count=0;
+    while(number>0)  {
+        number=number/10;
+        count++;
+    }
+    return count;
+
+}
+
 float series(int recursion,int agility)  {
     if (recursion==agility)  {
         return 0;
@@ -121,9 +131,9 @@ bool check_number(std::string str) {
 namespace name_pool {
     std::string hero_names[98]={"Abbathor","Aerdrie Faenya","Arvoreen","Baervan Wildwanderer","Baravar Cloakshadow","Berronar Truesilver","Brandobaris","Callarduran Smoothhands","Charmalaine","Clangeddin Silverbeard","Corellon Larethian","Cyrrollalee","Deep Sashelas","Dugmaren Brightmantle","Dumathoin","Ehlonna","Erevan Ilesere","Fenmarel Mestarine","Fharlanghn","Flandal Steelskin","Gadhelyn","Gaerdal Ironhand","Garl Glittergold","Gendwar Argrim","Halani Celanil","Heironeous","Labelas Enoreth","Moradin","Muamman Duathal","Olidammara","Pelor","Rillifane Rallathil","Roykyn","Segojan Earthcaller","Sehanine Moonbow","Sheela Peryroyl","Solonor Thelandira","St. Cuthbert","Urdlen","Urogalan","Vergadain","Ye'Cind","Yondalla","Annam","Bahamut","Blibdoolpoolp","Diirinka","Eadro","Gruumsh","Hruggek","Ilsensine","Jubilex","Kurtulmak","Laduguer","Loagzed","Lolth","Maglubiyet","Merrshaulk","Orcus","Sekolah","Semuanya","Shekinester","Skerrit","Stronmaus","Tiamat","Vaprak","Yeenoghu","Aasterinian","Bagrivyek","Bahgtru","Chronepsis","Doresain","Falazure","Gaknulak","Grankhul","Great Mother","Grolantor","Hiatea","Iallanis","Ilneval","Io","Karontor","Kiaransalee","Khurgorbaeyag","Luthic","Memnor","Nomog-Geaya","Panzuriel","Raxivort","Shargaas","Sixin","Skoraeus Stonebones","Squerrik","Surtr","Thrym","Vhaeraun","Yurtrus","Zinzerena"};
     std::string monster_names[102]={"Insane Daoist","A not so evil monster","Hellman","Tainthound","Dustfiend","Nethertree","The Grim Wraith","The Blissful Corpse","The Disgusting Phenomenon","The Amphibian Razor Hyena","The Grisly Ash Fiend","The Grisly Thunder Anaconda","Vileling","Plagueling","Stenchgolem","Fetidling","The Agitated Mumbler","The Dangerous Wraith","The Blissful Anomaly","The Brutal Berserker Gargoyle","The Grisly Vampire Lynx","The Tattooed Storm Bison","Vortexsnake","Abysssnake","Brineserpent","Acidfigure","The Monstrous Weirdo","The Ancient Tree","The Mad Shrieker","The Greater Ash Lion","The Elusive Killer Buffalo","The Raging Demon Drake","Blightwing","Cavernfoot","Cavehound","Wisphound","The Anguished Screamer","The Empty Brute","The Grumpy Lich","The Feathered Phantom Pig","The Vicious Hunting Owl","The Greater Warp Rat","Vilecreep","Plaguehand","Spectralteeth","Wispmask","The Defiant Horror","The Haunting Screamer","The Brown Plant","The Mad Tomb Buffalo","The Scarred Mist Cobra","The Ivory Blaze Freak","Corpsesnake","Gloomgolem","Cloudscreamer","Foulteeth","The Muted Vision","The Blind Ooze","The Bold Tumor","The Feathered Tomb Dragon","The Vicious Bane Crocodile","The Bloodthirsty Ash Bat","Nightsword","Infernotooth","Plaguecrackle","Smokefreak","The Canine Ooze","The Undead Phenomenon","The Wretched Behemoth","The Fiery Demon Bull","The Crimson Killer Viper","The Long-Horned Razor Scorpion","Gallghoul","Grievehood","Murkboy","Smogwing","The Disfigured Creeper","The Quiet Plant","The Active Weirdo","The Burnt Corpse Cobra","The Taloned Rot Crocodile","The Savage Slayer Hippo","Gallwings","Mournspawn","Mistflayer","Umbrawings","The Aged Ooze","The White Deviation","The Bronze Abnormality","The Ruthless Bone Bison","The Titanium Vampire Elephant","The Feral Harlequin Vermin","Nethercat","Smogstep","Thorntalon","Chaosbody","The Bold Ooze","The Brown Miscreation","The Barren Weirdo","The Tattooed Phantom Leviathan","The Painted Tomb Crocodile","The Burnt Raptor Warthog"};
-    std::string potion_names[66]={"Potion","Hi-Potion","X-Potion","Mega-Potion","Ether","Turbo Ether","Elixir","Megalixir","Phoenix Down","Mega Phoenix","Antidote","Echo Screen","Eye Drops","Holy Water","Remedy","Soft","Al Bhed Potion","Healing Water","Tetra Elemental","Candle of Life","Dream Powder","Farplane Shadow","Farplane Wind","Frag Grenade","Silence Grenade","Sleeping Powder","Smoke Bomb","Petrify Grenade","Poison Fang","Blessed Gem","Dark Matter","Shadow Gem","Shining Gem","Supreme Gem","Gold Hourglass","Healing Spring","Light Curtain","Lunar Curtain","Mana Spring","Mana Tablet","Mana Tonic","Purifying Salt","Silver Hourglass","Soul Spring","Stamina Spring","Stamina Tablet","Stamina Tonic","Star Curtain","Three Stars","Twin Stars","Ability Distiller","Amulet","Designer Wallet","Door to Tomorrow","Gambler's Spirit","Hypello Potion","Mana Distiller","Map","Musk","Pendulum","Power Distiller","Shining Thorn","Speed Distiller","Underdog's Secret","Wings to Discovery","Winning Formula"};
+    std::string potion_names[66]={"Potion","Hi-Potion","X-Potion","Mega-Potion","Ether","Turbo Ether","Elixir","Megalixir","Phoenix Down","Mega Phoenix","Antidote","Echo Screen","Eye Drops","Holy Water","Remedy","Soft","Al Bhed Potion","Heset Water","Tetra Elemental","Candle of Life","Dream Powder","Farplane Shadow","Farplane Wind","Frag Grenade","Silence Grenade","Sleeping Powder","Smoke Bomb","Petrify Grenade","Poison Fang","Blessed Gem","Dark Matter","Shadow Gem","Shining Gem","Supreme Gem","Gold Hourglass","Heset Spring","Light Curtain","Lunar Curtain","Mana Spring","Mana Tablet","Mana Tonic","Purifying Salt","Silver Hourglass","Soul Spring","Stamina Spring","Stamina Tablet","Stamina Tonic","Star Curtain","Three Stars","Twin Stars","Ability Distiller","Amulet","Designer Wallet","Door to Tomorrow","Gambler's Spirit","Hypello Potion","Mana Distiller","Map","Musk","Pendulum","Power Distiller","Shining Thorn","Speed Distiller","Underdog's Secret","Wings to Discovery","Winning Formula"};
     std::string spell_names[91]={"Flame","Torch","Eruption","Flare","Blaze","Inferno","Fireball","Explosion","Meteor","Salamander’s Blade","Dragon Fire","Sinkhole","Pit","Chasm","Vine","Thorn","Nettle","Rockfall","Landslide","Avalanche","Chill","Freeze","Frostbite","Douse","Deluge","Flood","Wave","Surge","Tsunami","Nyad’s Lore","Sleep","Slumber","Shock","Bolt","Plasma","Gust","Gale","Tempest","Whirlwhind","Cyclone","Vortex","Wyvern’s Wings","Daze","Stun","Confuse","Light","Flash","Radiance","Cleanse","Scour","Purge","Wrath","Retribution","Judgment","Angel’s Mercy","Darkness","Shade","Gloom","Decay","Fester","Corrupt","Spite","Rancor","Malice","Demon’s Rage","Drain","Siphon","Void","Bolt Strike","Freeze Wave","Inferno Blaze","Channel Energy","Shadow Blade","Heaven's Sword","Blazing Katana","Staff of Ice","Arrow of Purity","Blazing Arrows","Burn the Soul","Fire Wings","Fury of Osano-Wo","Gaijin Flames","Hungry Blade","Yakamo’s Wrath","Yakamo’s Eye","Breath of Suitengu","The Inner Ocean","Surging Soul","Endless Depth","Kharmic Intent","Whispered Blade"};
-    std::string weapon_names[119]={"Caladbolg","Taming Sword","Crystal Sword","Excalibur","Ragnarok","Balmung","Save the Queen","Heartbreaker","Lionheart","Durandal","Ascalon","Ambitious","Hrunting","Astral Sword","Apocalypse","Slowstrike","Master Sword","Rune-Master","Warlock","Arc Sword","Gilventure","Tri-Steel","Helter-Skelter","Vendetta","Avenger","Prism Steel","Mirage Sword","Lifesaver","Sonic Steel","Vigilante","Dance Macabre","Largamente","Gravestone","Sidewinder","Nightmare","Mage Masher","Nightbringer","Knight Sword","Wizard Sword","Double-Edge","Razzmatazz","Deathbringer","Stunning Steel","Basilisk Steel","Poison Steel","Lullaby Steel","Muted Steel","Twilight Steel","Hunter's Sword","Flametongue","Ice Brand","Lightning Steel","Force Saber","Baroque Sword","Sorcery Sword","Soldier's Saber","Rune Steel","Enchanted Sword","Fencing Saber","Slasher","Nirvana","Herding Staff","Arc Arcana","Abraxas","Heavenly Axis","Judgment","Seraphim Rod","Rod of Roses","Nimbus Rod","Wing Wand","Wonder Wand","Laevatein","Astral Rod","Chaos Rod","Power Staff","Shining Staff","Faerie Staff","Magistral Rod","El Dorado","Tri-Rod","Wicked Wand","Nemesis Rod","Defender","Prism Rod","Mirage Rod","Healing Rod","Wind Rod","Conductor","Punisher","Calcite Staff","Bizarre Staff","Staff of Thorns","Reticent Staff","Darkness Staff","Monk Staff","Mage's Staff","Dual Rod","Ominous Rod","Death Wand","Entangling Rod","Break Rod","Belladonna Wand","Lullaby Rod","Rod of Silence","Rod of Darkness","Rod of Wisdom","Rod of Fire","Rod of Ice","Rod of Lightning","Rod of Water","Malleable Staff","Force Rod","Ductile Rod","Sorcery Rod","Full Metal Rod","Rune Rod","Enchanted Rod","Rod of Striking","Spiked Rod"};
+    std::string weapon_names[119]={"Caladbolg","Taming Sword","Crystal Sword","Excalibur","Ragnarok","Balmung","Save the Queen","Heartbreaker","Lionheart","Durandal","Ascalon","Ambitious","Hrunting","Astral Sword","Apocalypse","Slowstrike","Master Sword","Rune-Master","Warlock","Arc Sword","Gilventure","Tri-Steel","Helter-Skelter","Vendetta","Avenger","Prism Steel","Mirage Sword","Lifesaver","Sonic Steel","Vigilante","Dance Macabre","Largamente","Gravestone","Sidewinder","Nightmare","Mage Masher","Nightbringer","Knight Sword","Wizard Sword","Double-Edge","Razzmatazz","Deathbringer","Stunning Steel","Basilisk Steel","Poison Steel","Lullaby Steel","Muted Steel","Twilight Steel","Hunter's Sword","Flametongue","Ice Brand","Lightning Steel","Force Saber","Baroque Sword","Sorcery Sword","Soldier's Saber","Rune Steel","Enchanted Sword","Fencing Saber","Slasher","Nirvana","Herding Staff","Arc Arcana","Abraxas","Heavenly Axis","Judgment","Seraphim Rod","Rod of Roses","Nimbus Rod","Wing Wand","Wonder Wand","Laevatein","Astral Rod","Chaos Rod","Power Staff","Shining Staff","Faerie Staff","Magistral Rod","El Dorado","Tri-Rod","Wicked Wand","Nemesis Rod","Defender","Prism Rod","Mirage Rod","Heset Rod","Wind Rod","Conductor","Punisher","Calcite Staff","Bizarre Staff","Staff of Thorns","Reticent Staff","Darkness Staff","Monk Staff","Mage's Staff","Dual Rod","Ominous Rod","Death Wand","Entangling Rod","Break Rod","Belladonna Wand","Lullaby Rod","Rod of Silence","Rod of Darkness","Rod of Wisdom","Rod of Fire","Rod of Ice","Rod of Lightning","Rod of Water","Malleable Staff","Force Rod","Ductile Rod","Sorcery Rod","Full Metal Rod","Rune Rod","Enchanted Rod","Rod of Striking","Spiked Rod"};
     std::string armor_names[79]={"Genji Shield","Emblem","Crystal Shield","Aegis Shield","Golem Shield","Revive Shield","Rescue Shield","Paladin Shield","Diamond Shield","Ruby Shield","Dynasty Shield","Magister Shield","Collector's Shield","Treasure Shield","Shield of Hope","Assault Shield","Phantom Shield","Recovery Shield","Spiritual Shield","Phoenix Shield","Curative Shield","Rainbow Shield","Shining Shield","Faerie Shield","Peaceful Shield","Shaman Shield","Barrier Shield","Star Shield","Marching Shield","Moon Shield","Regen Shield","Haste Shield","Reflect Shield","Protect Shield","Shell Shield","Platinum Shield","Sapphire Shield","Knight's Shield","Wizard Shield","Elemental Shield","Defending Shield","Crimson Shield","Snow Shield","Ochre Shield","Cerulean Shield","Medical Shield","Lucid Shield","Serene Shield","Light Shield","Soul Shield","Blessed Shield","Soft Shield","Serum Shield","Alert Shield","Echo Shield","Bright Shield","Red Shield","White Shield","Yellow Shield","Blue Shield","NulTide Shield","NulBlaze Shield","NulFrost Shield","Adept's Shield","Tetra Shield","Mythril Shield","Gold Shield","Emerald Shield","Soldier's Shield","Mage's Shield","Silver Shield","Onyx Shield","Sorcery Shield","Warrior's Shield","Glorious Shield","Metal Shield","Pearl Shield","Magic Shield","Seeker's Shield"};
     std::string get_random_hero_name() {
         return hero_names[rand()%98];
@@ -402,7 +412,7 @@ void LivingBeing::restore_life(int amount)  {
 
 //////////////////////////////////////////////////////Hero//////////////////////////////////////////////
 
-Hero::Hero(std::string name,int health,int magic_power_capacity,int strength,int dexterity,int agility,int money)  : LivingBeing(name,health,1), magic_power_capacity(magic_power), magic_power(magic_power), strength(strength), base_strength(strength), base_dexterity(dexterity), dexterity(dexterity), base_agility(agility), agility(agility), money(money)  { 
+Hero::Hero(std::string name,int health,int magic_power_capacity,int strength,int dexterity,int agility,int money,short hero_type)  : LivingBeing(name,health,1), magic_power_capacity(magic_power), magic_power(magic_power), strength(strength), base_strength(strength), base_dexterity(dexterity), dexterity(dexterity), base_agility(agility), agility(agility), money(money), hero_type(hero_type)  { 
     evasion_chance=series(5,agility);
     bool two_handed=((rand()%10)<5);
     weapon=new Weapon(name_pool::get_random_weapon_name(),get_gear_price(1),1,get_weapon_attack(1,two_handed),two_handed);
@@ -1263,21 +1273,25 @@ bool Hero::display_stats()  {
 
 }
 
+short Hero::get_hero_type()  {
+    return hero_type;
+}
+
 //////////////////////////////////////////////////////Warrior////////////////////////////////////////
 
-Warrior::Warrior(std::string name) : Hero(name,400,100,high_stat_random_value(),low_stat_random_value(),high_stat_random_value(),100)  {}
+Warrior::Warrior(std::string name) : Hero(name,400,100,high_stat_random_value(),low_stat_random_value(),high_stat_random_value(),100,0)  {}
 
 //////////////////////////////////////////////////////Paladin////////////////////////////////////////
 
-Paladin::Paladin(std::string name) : Hero(name,400,100,high_stat_random_value(),high_stat_random_value(),low_stat_random_value(),100)  {}
+Paladin::Paladin(std::string name) : Hero(name,400,100,high_stat_random_value(),high_stat_random_value(),low_stat_random_value(),100,1)  {}
 
 //////////////////////////////////////////////////////Sorcerer////////////////////////////////////////
 
-Sorcerer::Sorcerer(std::string name) : Hero(name,400,100,low_stat_random_value(),high_stat_random_value(),high_stat_random_value(),100)  {}
+Sorcerer::Sorcerer(std::string name) : Hero(name,400,100,low_stat_random_value(),high_stat_random_value(),high_stat_random_value(),100,2)  {}
 
 //////////////////////////////////////////////////////Monster////////////////////////////////////////
 
-Monster::Monster(std::string name,int avg_damage,int defense,int evasion_chance,int lvl) : LivingBeing(name,(int)(((float)(lvl-1))/10.0+1)*520,lvl), avg_damage(avg_damage), defense(defense), evasion_chance(evasion_chance)  {
+Monster::Monster(std::string name,int avg_damage,int defense,int evasion_chance,int lvl,short monster_type) : LivingBeing(name,(int)(((float)(lvl-1))/10.0+1)*520,lvl), avg_damage(avg_damage), defense(defense), evasion_chance(evasion_chance), monster_type(monster_type) {
     for (int i=0;i<3;i++)  {
         effects.push_back(Effect());
     }
@@ -1341,18 +1355,22 @@ void Monster::round_passes()  {
     }
 }
 
+short Monster::get_monster_type()  {
+    return monster_type;
+}
+
 //////////////////////////////////////////////////////Dragon////////////////////////////////////////
 
-Dragon::Dragon(std::string name,int lvl) : Monster(name,high_attack_random_value()*(((float)(lvl-1))/10.0+1),low_defense_random_value()*(((float)(lvl-1))/10.0+1),low_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl)  {}
+Dragon::Dragon(std::string name,int lvl) : Monster(name,high_attack_random_value()*(((float)(lvl-1))/10.0+1),low_defense_random_value()*(((float)(lvl-1))/10.0+1),low_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl,0)  {}
 
 //////////////////////////////////////////////////////Exoskeleton////////////////////////////////////////
 
-Exoskeleton::Exoskeleton(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))/10.0+1),high_defense_random_value()*(((float)(lvl-1))/10.0+1),low_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl)  {}
+Exoskeleton::Exoskeleton(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))/10.0+1),high_defense_random_value()*(((float)(lvl-1))/10.0+1),low_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl,1)  {}
 
 
 //////////////////////////////////////////////////////Spirit////////////////////////////////////////
 
-Spirit::Spirit(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))/10.0+1),low_defense_random_value()*(((float)(lvl-1))/10.0+1),high_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl)  {}
+Spirit::Spirit(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))/10.0+1),low_defense_random_value()*(((float)(lvl-1))/10.0+1),high_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl,2)  {}
 
 //////////////////////////////////////////////////////Hero_Party////////////////////////////////////////
 
@@ -1499,7 +1517,7 @@ void Hero_Party::receive_input(char input)  {
     }
 }
 
-Hero* Hero_Party::get_target(int n)  {
+Hero* Hero_Party::get_hero(int n)  {
     return heroes.at(n);
 }
 
@@ -1544,7 +1562,7 @@ void Monster_Party::prepare_for_next_round()  {
 void Monster_Party::attack_heroes(Hero_Party& Hero_Party)  {
     for (int i=0;i<monsters.size();i++)  {
         if (monsters.at(i)->get_health()>0)  {
-            monsters.at(i)->attack(Hero_Party.get_target(rand()%monsters.size()));
+            monsters.at(i)->attack(Hero_Party.get_hero(rand()%monsters.size()));
         }
     }
 }
@@ -1557,13 +1575,8 @@ bool Monster_Party::in_fighting_condition()  {
     return to_return;
 }
 
-Monster* Monster_Party::get_target(std::string monster_name)  {
-    for (int i=0;i<monsters.size();i++)  {
-        if (monsters.at(i)->get_name().compare(monster_name)==0)  {
-            return monsters.at(i);
-        }
-    }
-    return NULL;
+Monster* Monster_Party::get_monster(int i)  {
+    return monsters.at(i);
 }
 
 void Monster_Party::victory()  {
@@ -1576,8 +1589,14 @@ void Monster_Party::victory()  {
 
 Fight::Fight(Hero_Party* hero_party) : round_count(1), hero_party(hero_party)  {
     monster_party=new Monster_Party(hero_party->get_heroes_level(),hero_party->get_number_of_heroes());
+    std::string message;
+    std::string input;
     while (true)  {
-        heroes_turn();
+        message="Round ";
+        message.append(std::to_string(round_count));
+        message.append("\n");
+        print_battle(message);
+        /*heroes_turn();
         monsters_turn();
         if (!hero_party->in_fighting_condition())  {
             hero_party->defeat();
@@ -1587,7 +1606,9 @@ Fight::Fight(Hero_Party* hero_party) : round_count(1), hero_party(hero_party)  {
             hero_party->victory();
             break ;
         }
+        */
         next_round();
+        std::cin>> input;
     }
 }
 
@@ -1601,8 +1622,9 @@ void Fight::heroes_turn()  {
     }
 }
 
-void Fight::print_battle(std::string message)  {
-    std  ::string Dragon_components[11]={
+void Fight::print_battle(std::string action)  {
+    system("clear");
+    std::string Dragon_components[11]={
     "       ||       ||       ",
     "       |||_____|||       ",
     "         ||~ ~||         ",
@@ -1614,7 +1636,7 @@ void Fight::print_battle(std::string message)  {
     "       (---------)       ",
     "        (-------)        ",
     "          ^   ^          "};
-    std::string Exoskeleton[11]={
+    std::string Exoskeleton_components[11]={
     "           ^  ^          ",        
     "          (*--*)         ",
     "     ______||||_____     ",
@@ -1626,7 +1648,7 @@ void Fight::print_battle(std::string message)  {
     "          |   |          ",
     "          |   |          ",
     "         _|   |_         "};
-    std::string Spirit[11]={
+    std::string Spirit_components[11]={
     "  {                 }    ",
     "   {}{}         {}{}     ",
     "      |_________|        ",
@@ -1638,7 +1660,7 @@ void Fight::print_battle(std::string message)  {
     "         ||      ||==>   ",
     "          ||    ||       ",
     "           ||==||        ",};    
-    std::string Sorcerer[11]={
+    std::string Sorcerer_components[11]={
     "           |||           ",
     "          |||||          ",
     "      ___|||||||___      ",
@@ -1650,7 +1672,7 @@ void Fight::print_battle(std::string message)  {
     "           | |           ",
     "           | |           ",
     "           & &           "};
-    std::string Warrior[11]={
+    std::string Warrior_components[11]={
     "         ^     ^         ",
     "         |^___^|         ",
     "       <=|||||||=>       ",
@@ -1662,42 +1684,149 @@ void Fight::print_battle(std::string message)  {
     "          {| |}          ",
     "         {|   |}         ",
     "          &   &          "};
-    std::string Palading[11]={
-    "         |||+|||          ",
-    "         |||||||          ",
-    "         |(^ ^)|          ",
-    "    {#}    |||    {#}     ",
-    "    {|    | | |    |}     ",
-    "    {|===| +|  |===|}     ",
-    "        |   |   |         ",
-    "       |    |    |        ",
-    "      |___________|       ",
-    "         {|   |}          ",
-    "          &   &           "};
-    std::string Dead_Foe[11]={
-    "                          ",
-    "                          ",
-    "                          ",
-    "         _______          ",
-    "         [X   X]          ",
-    "          [---]           ",
-    "           |||            ",
-    "            O             ",
-    "            o             ",
-    "                          ",
-    "                          "};
-    std::string Dead_Friendly[11]={
-    "                          ",
-    "                          ",
-    "          _____           ",
-    "         (     )          ",
-    "        ( o   o )         ",
-    "         | ~~~ |          ",
-    "          |||||           ",
-    "           (O)            ",
-    "            O             ",
-    "            o             ",
-    "                          "};
+    std::string Paladin_components[11]={
+    "         |||+|||         ",
+    "         |||||||         ",
+    "         |(^ ^)|         ",
+    "    {#}    |||    {#}    ",
+    "    {|    | | |    |}    ",
+    "    {|===| +|  |===|}    ",
+    "        |   |   |        ",
+    "       |    |    |       ",
+    "      |___________|      ",
+    "         {|   |}         ",
+    "          &   &          "};
+    std::string Dead_Foe_components[11]={
+    "                         ",
+    "                         ",
+    "                         ",
+    "         _______         ",
+    "         [X   X]         ",
+    "          [---]          ",
+    "           |||           ",
+    "            O            ",
+    "            o            ",
+    "                         ",
+    "                         "};
+    std::string Dead_Friendly_components[11]={
+    "                         ",
+    "                         ",
+    "          _____          ",
+    "         (     )         ",
+    "        ( o   o )        ",
+    "         | ~~~ |         ",
+    "          |||||          ",
+    "           (O)           ",
+    "            O            ",
+    "            o            ",
+    "                         "};
+    
+    int padding[3];
+    int length[3];
+    int name_set_to_center[3];
+    int distance=4;
+    int hp_length;
+    int hp_max_length;
+    for (int x=0;x<hero_party->get_number_of_heroes();x++)  {
+        hp_length=count_digit(hero_party->get_hero(x)->get_health());
+        hp_max_length=count_digit(hero_party->get_hero(x)->get_health_capacity());
+        if ((monster_party->get_monster(x)->get_name().length()+4+hp_length+hp_max_length)>25)  {
+            length[x]=monster_party->get_monster(x)->get_name().length()+4+hp_length+hp_max_length;
+        }
+        else  {
+            length[x]=25;
+        }
+        padding[x]=length[x]/2-12;
+        name_set_to_center[x]=(length[x]-(monster_party->get_monster(x)->get_name().length()+4+hp_length+hp_max_length))/2;
+        for (int i=0;i<name_set_to_center[x];i++)  {
+            std::cout << " ";
+        }
+        std::cout <<monster_party->get_monster(x)->get_name()<<" ("<< monster_party->get_monster(x)->get_health()<<"/"<<monster_party->get_monster(x)->get_health_capacity() <<")";
+        for (int i=0;i<name_set_to_center[x]+distance;i++)  {
+            std::cout << " ";
+        }
+    }
+    std::cout <<'\n';
+    for (int line=0;line<11;line++)  {
+        for (int x=0;x<hero_party->get_number_of_heroes();x++)  {
+            for (int i=0;i<padding[x];i++)  {
+                std::cout<< " ";
+            }
+            if (monster_party->get_monster(x)->get_health()>0)  {
+                switch (monster_party->get_monster(x)->get_monster_type())  {
+                    case 0:
+                        std::cout << Dragon_components[line];
+                        break;
+                    case 1:
+                        std::cout << Exoskeleton_components[line];
+                        break;
+                    case 2:
+                        std::cout << Spirit_components[line];
+                        break;
+                }
+            }
+            else  {
+                std::cout << Dead_Foe_components[line];
+            }
+            for (int i=0;i<padding[x]+distance;i++)  {
+                std::cout<< " ";
+            }
+        }
+        std::cout << '\n';
+    }
+    std::cout <<"\n\n";
+    for (int i=0;i<hero_party->get_number_of_heroes()*(25/2);i++)  {
+        std::cout << " ";
+    }
+    std::cout<< action << '\n';
+    std::cout <<"\n\n";
+    for (int x=0;x<hero_party->get_number_of_heroes();x++)  {
+        hp_length=count_digit(monster_party->get_monster(x)->get_health());
+        hp_max_length=count_digit(monster_party->get_monster(x)->get_health_capacity());
+        if ((hero_party->get_hero(x)->get_name().length()+4+hp_length+hp_max_length)>25)  {
+            length[x]=hero_party->get_hero(x)->get_name().length()+4+hp_length+hp_max_length;
+        }
+        else  {
+            length[x]=25;
+        }
+        padding[x]=length[x]/2-12;
+        name_set_to_center[x]=(length[x]-(hero_party->get_hero(x)->get_name().length()+4+hp_length+hp_max_length))/2;
+        for (int i=0;i<name_set_to_center[x];i++)  {
+            std::cout << " ";
+        }
+        std::cout <<hero_party->get_hero(x)->get_name()<<" ("<< hero_party->get_hero(x)->get_health()<<"/"<<hero_party->get_hero(x)->get_health_capacity() <<")";
+        for (int i=0;i<name_set_to_center[x]+distance;i++)  {
+            std::cout << " ";
+        }
+    }
+    std::cout <<'\n';
+    for (int line=0;line<11;line++)  {
+        for (int x=0;x<hero_party->get_number_of_heroes();x++)  {
+            for (int i=0;i<padding[x];i++)  {
+                std::cout<< " ";
+            }
+            if (hero_party->get_hero(x)->get_health()>0)  {
+                switch (hero_party->get_hero(x)->get_hero_type())  {
+                    case 0:
+                        std::cout << Warrior_components[line];
+                        break;
+                    case 1:
+                        std::cout << Paladin_components[line];
+                        break;
+                    case 2:
+                        std::cout << Sorcerer_components[line];
+                        break;
+                }
+            }
+            else  {
+                std::cout << Dead_Friendly_components[line];
+            }
+            for (int i=0;i<padding[x]+distance;i++)  {
+                std::cout<< " ";
+            }
+        }
+        std::cout << '\n';
+    }
 }
 
 void Fight::next_round()  {
@@ -2474,7 +2603,7 @@ Grid::~Grid()  {
 }
 
 bool Grid::fight_triggered()  {
-    short dice=rand()%7;
+    short dice=rand()%2;
     if (dice==0)  {
         return true;
     }

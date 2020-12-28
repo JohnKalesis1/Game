@@ -1,4 +1,4 @@
-//#include "entities.h"
+///#include "entities.h"
 //#include <stdlib.h>
 //#include <iostream>
 #include <string>
@@ -45,27 +45,27 @@ int low_stat_random_value()  {
 }
 
 int high_attack_random_value()  {
-    return 0;
+    return 250;
 }
 
 int low_attack_random_value()  {
-    return 0;
+    return 100;
 }
 
 int high_defense_random_value()  {
-    return 0;
+    return 10;
 }
 
 int low_defense_random_value()  {
-    return 0;    
+    return 10;    
 }
 
 float high_evasion_random_value()  {
-    return 0.0;
+    return 5.0;
 }
 
 float low_evasion_random_value()  {
-    return 0.0;    
+    return 2.0;    
 }
 
 int get_random_number_of_wares()  {
@@ -76,27 +76,23 @@ int get_pseudo_random_level()  {
     return 1+rand()%2;
 }
 
-float get_encounter_chance()  {
-    return 0.0;
-}
-
 int get_weapon_attack(int level,bool two_handed)  {
-    return 0;
+    return 20;
 }
 
 int get_armor_defense(int level)  {
-    return 0;    
+    return 6;    
 }
 
 int get_gear_price(int level)  {
     return 0;
 }
 int get_potion_effect(int level,int type)  {
-    return 0;    
+    return 10;    
 }
 
 int get_weapon_armor_price(int level)  {
-    return 0;
+    return 10;
 }
 
 int get_potion_price(int level)  {
@@ -112,11 +108,11 @@ int get_spell_mp_cost(int level)  {
 }
 
 int get_spell_damage(int level,int mp_cost)  {
-    return 0;
+    return 20;
 }
 
 int damage_value(int average_damage)  {
-    return 9*(average_damage/10.0)+rand()%(average_damage);
+    return 9*((float)average_damage/10.0)+2*rand()%(average_damage/10);
 }
 
 bool check_number(std::string str) {
@@ -330,9 +326,12 @@ int Potion::get_boost()  {
 
 //////////////////////////////////////////////////////Spell//////////////////////////////////////////////
 
-void Spell::initiate_spell(Monster* monster,int dexterity)  {
-    monster->receive_damage(avg_damage+dexterity);
-    monster->receive_debuff(effect);
+int Spell::initiate_spell(Monster* monster,int dexterity)  {
+    int attack_successful=monster->receive_damage(avg_damage+dexterity);
+    if (attack_successful>=0)  {
+        monster->receive_debuff(effect);
+    }
+    return attack_successful;
 }
 
 int Spell::get_lvl_requirement()  {
@@ -485,7 +484,7 @@ std::list<Spell*>& Hero::get_spells()  {
 }
 
 bool Hero::evade()  {
-    float random_float=(float)rand()/(float)RAND_MAX;
+    float random_float=(float)rand()/100.0;
     if (random_float<evasion_chance)  {
         return true;
     }
@@ -504,12 +503,11 @@ bool Hero::try_and_level_up()  {
     return flag;
 }
 
-void Hero::cast_spell(std::string spell_name,Monster* monster)  {
+int Hero::cast_spell(std::string spell_name,Monster* monster)  {
     std::list<Spell*>::iterator it=spells.begin();
     for (int i=0;i<spells.size();i++)  {
         if (it.operator*()->get_name().compare(spell_name)==0)  {
-            it.operator*()->initiate_spell(monster,dexterity);
-            return ;
+            return it.operator*()->initiate_spell(monster,dexterity);
         }
         else  {
             std::advance(it,1);
@@ -528,8 +526,8 @@ void Hero::level_up()  {
     evasion_chance=series(5,agility);
 }
 
-void Hero::attack(Monster* monster)  {
-    monster->receive_damage(weapon->attack()+strength);
+int Hero::attack(Monster* monster)  {
+    return monster->receive_damage(weapon->attack()+strength);
 }
 
 void Hero::restore_mp(int amount)  {
@@ -549,17 +547,28 @@ void Hero::increase_wealth(int amount)  {
     money=money+amount;
 }
 
-void Hero::receive_damage(int damage)  {
+int Hero::receive_damage(int damage)  {
     if (evade())  {
-
+        return -1;
     }
     else  {
         if (armor==NULL)  {
             health=health-damage;
+            if (health<0)  {
+                health=0;
+            }
+            return damage;
         }
         else  {
             if (damage>armor->defend())  {
                 health=health+armor->defend()-damage;
+                if (health<0)  {
+                    health=0;
+                }
+                return damage-armor->defend();
+            }
+            else  {
+                return 0;
             }
         }
     }
@@ -1297,16 +1306,20 @@ Monster::Monster(std::string name,int avg_damage,int defense,int evasion_chance,
     }
 }
 
+Monster::~Monster()  {
+
+}
+
 void Monster::diplay_stats()  {
 
 }
 
-void Monster::attack(Hero* hero)  {
+int Monster::attack(Hero* hero)  {
     if (effects.at(0).is_active())  {
-        hero->receive_damage(effects.at(0).apply_effect(damage_value(avg_damage)));
+        return hero->receive_damage(effects.at(0).apply_effect(damage_value(avg_damage)));
     }
     else  {
-        hero->receive_damage(damage_value(avg_damage));
+        return hero->receive_damage(damage_value(avg_damage));
     }
 }
 
@@ -1327,9 +1340,9 @@ bool Monster::evade()  {
     }
 }
 
-void Monster::receive_damage(int damage)  {
+int Monster::receive_damage(int damage)  {
     if (evade())  {
-
+        return -1;
     }
     else  {
         int true_defense;
@@ -1341,7 +1354,14 @@ void Monster::receive_damage(int damage)  {
         }
         if (damage>true_defense)  {
             health=health+true_defense-damage;
+            if (health<0)  {
+                health=0;
+            }
+            return damage-true_defense;
         }  
+        else  {
+            return 0;
+        }
     }
 }
 
@@ -1416,8 +1436,10 @@ int Hero_Party::get_y_position()  {
 
 void Hero_Party::prepare_for_next_round()  {
     for (int i=0;i<heroes.size();i++)  {
-        heroes.at(i)->restore_life(heroes.at(i)->get_health_capacity()/5);
-        heroes.at(i)->restore_mp(heroes.at(i)->get_magic_power_capacity()/6);
+        if (heroes.at(i)->get_health()>0)  {
+            heroes.at(i)->restore_life(heroes.at(i)->get_health_capacity()/5);
+            heroes.at(i)->restore_mp(heroes.at(i)->get_magic_power_capacity()/6);
+        }
     }
 }
 
@@ -1559,14 +1581,6 @@ void Monster_Party::prepare_for_next_round()  {
     }
 }
 
-void Monster_Party::attack_heroes(Hero_Party& Hero_Party)  {
-    for (int i=0;i<monsters.size();i++)  {
-        if (monsters.at(i)->get_health()>0)  {
-            monsters.at(i)->attack(Hero_Party.get_hero(rand()%monsters.size()));
-        }
-    }
-}
-
 bool Monster_Party::in_fighting_condition()  {
     bool to_return=0;
     for (int i=0;i<monsters.size();i++)  {
@@ -1594,10 +1608,18 @@ Fight::Fight(Hero_Party* hero_party) : round_count(1), hero_party(hero_party)  {
     while (true)  {
         message="Round ";
         message.append(std::to_string(round_count));
-        message.append("\n");
-        print_battle(message);
-        /*heroes_turn();
+        print_battle(message," ");
+        if (quit_game)  {
+            return;
+        }
+        //heroes_turn();
+        if (quit_game)  {
+            return;
+        }
         monsters_turn();
+        if (quit_game)  {
+            return;
+        }
         if (!hero_party->in_fighting_condition())  {
             hero_party->defeat();
             break ;
@@ -1606,14 +1628,51 @@ Fight::Fight(Hero_Party* hero_party) : round_count(1), hero_party(hero_party)  {
             hero_party->victory();
             break ;
         }
-        */
         next_round();
-        std::cin>> input;
     }
 }
 
+Fight::~Fight()  {
+    delete monster_party;
+}
+
 void Fight::monsters_turn()  {
-    monster_party->attack_heroes(*hero_party);
+    for (int i=0;i<hero_party->get_number_of_heroes();i++)  {
+        Hero* hero_attacked;
+        int successful_strike;
+        std::string action_message,result_message;
+        short pick_target=rand()%hero_party->get_number_of_heroes();
+        hero_attacked=hero_party->get_hero(pick_target);
+        for (int j=0;j<2;j++)  {
+            pick_target++;
+            hero_attacked=hero_party->get_hero((pick_target)%hero_party->get_number_of_heroes());
+            if (hero_attacked->get_health()>0)  {
+                break;
+            }
+            if (j==1)  {
+                return ;
+            }
+        }
+        successful_strike=monster_party->get_monster(i)->attack(hero_attacked);
+        action_message.append(monster_party->get_monster(i)->get_name());
+        action_message.append(" attacked ");
+        action_message.append(hero_attacked->get_name());
+        if (successful_strike>0)  {
+            result_message.append("Inflicted ");
+            result_message.append(std::to_string(successful_strike));
+            result_message.append(" damage");
+        }
+        else if (successful_strike==0)  {
+            result_message.append("Hero's defense too high, damage nullified");
+        }
+        else if (successful_strike==-1)  {
+            result_message.append("Hero evaded the attack");
+        }
+        print_battle(action_message,result_message);
+        if (quit_game)  {
+            return ;
+        }
+    }
 }
 
 void Fight::heroes_turn()  {
@@ -1622,7 +1681,7 @@ void Fight::heroes_turn()  {
     }
 }
 
-void Fight::print_battle(std::string action)  {
+void Fight::print_battle(std::string action_message,std::string result_message)  {
     system("clear");
     std::string Dragon_components[11]={
     "       ||       ||       ",
@@ -1728,8 +1787,8 @@ void Fight::print_battle(std::string action)  {
     int hp_length;
     int hp_max_length;
     for (int x=0;x<hero_party->get_number_of_heroes();x++)  {
-        hp_length=count_digit(hero_party->get_hero(x)->get_health());
-        hp_max_length=count_digit(hero_party->get_hero(x)->get_health_capacity());
+        hp_length=count_digit(monster_party->get_monster(x)->get_health());
+        hp_max_length=count_digit(monster_party->get_monster(x)->get_health_capacity());
         if ((monster_party->get_monster(x)->get_name().length()+4+hp_length+hp_max_length)>25)  {
             length[x]=monster_party->get_monster(x)->get_name().length()+4+hp_length+hp_max_length;
         }
@@ -1778,7 +1837,11 @@ void Fight::print_battle(std::string action)  {
     for (int i=0;i<hero_party->get_number_of_heroes()*(25/2);i++)  {
         std::cout << " ";
     }
-    std::cout<< action << '\n';
+    std::cout<< action_message << '\n';
+    for (int i=0;i<hero_party->get_number_of_heroes()*(25/2);i++)  {
+        std::cout << " ";
+    }
+    std::cout<< result_message << '\n';
     std::cout <<"\n\n";
     for (int x=0;x<hero_party->get_number_of_heroes();x++)  {
         hp_length=count_digit(monster_party->get_monster(x)->get_health());
@@ -1827,6 +1890,14 @@ void Fight::print_battle(std::string action)  {
         }
         std::cout << '\n';
     }
+    std::string to_trash_can;
+    std::cout << "(Guit game: q)\n";
+    std::cout << "Press any button to continue:";
+    std::cin >> to_trash_can;
+    if (to_trash_can.compare("q")==0)  {
+        quit_game=true;
+    }
+    return ;
 }
 
 void Fight::next_round()  {
@@ -2704,6 +2775,7 @@ void Grid::receive_input()  {
                     if (!World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
                         if (fight_triggered())  {
                             fight=new Fight(hero_party);
+                            delete fight;
                         }
                     }
                 }
@@ -2717,6 +2789,7 @@ void Grid::receive_input()  {
                     if (!World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
                         if (fight_triggered())  {
                             fight=new Fight(hero_party);
+                            delete fight;
                         }
                     }
                 }
@@ -2730,6 +2803,7 @@ void Grid::receive_input()  {
                     if (!World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
                         if (fight_triggered())  {
                             fight=new Fight(hero_party);
+                            delete fight;
                         }
                     }
                 }
@@ -2743,6 +2817,7 @@ void Grid::receive_input()  {
                     if (!World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
                         if (fight_triggered())  {
                             fight=new Fight(hero_party);
+                            delete fight;
                         }
                     }
                 }

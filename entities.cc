@@ -49,7 +49,7 @@ int get_effect_duration(int level)  {
 }
 
 float get_effect_percentage(int level)  {
-    return 25.0;
+    return 0.1;
 }
 
 int high_attack_random_value()  {
@@ -1428,7 +1428,7 @@ bool Hero::show_availabe_spells_and_promt_for_activation(bool* turn,std::string*
         std::cout << "Spells:\n";
         Spell* spell;
         for (int i=0;i<spells.size();i++)  {
-            if (it.operator*()->get_type_of_spell()==0)  {
+            if (it.operator*()->get_type_of_spell()==2)  {
                 spell=it.operator*();
                 std::cout << i+1 <<"." << spell->get_name()<<"(Ligthing Spell)";
                 spell_choices[i]=spell;
@@ -1448,7 +1448,7 @@ bool Hero::show_availabe_spells_and_promt_for_activation(bool* turn,std::string*
                 std::cout << " Effect: Reduced defense by "<<spell->get_effect().get_percentage() <<" for "<< spell->get_effect().get_duration() <<" rounds\n";
                 std::cout <<" Level: "<<spell->get_lvl_requirement()<<'\n';
             }
-            if (it.operator*()->get_type_of_spell()==2)  {
+            if (it.operator*()->get_type_of_spell()==0)  {
                 spell=it.operator*();
                 std::cout << i+1 <<"." << spell->get_name() <<"(Ice Spell)";
                 spell_choices[i]=spell;
@@ -1874,16 +1874,19 @@ bool Hero_Party::in_fighting_condition()  {
 void Hero_Party::defeat()  {
     for (int i=0;i<heroes.size();i++)  {
         heroes.at(i)->lose_money(heroes.at(i)->get_wealth()/2);
-        heroes.at(i)->restore_life(heroes.at(i)->get_health_capacity());
-        heroes.at(i)->restore_mp(heroes.at(i)->get_magic_power_capacity());
+        heroes.at(i)->restore_life(heroes.at(i)->get_health_capacity()/2);
+        heroes.at(i)->restore_mp(heroes.at(i)->get_magic_power_capacity()/2);
     }
 }
 
 void Hero_Party::victory()  {
     for (int i=0;i<heroes.size();i++)  {
-        heroes.at(i)->increase_wealth(0);
-        heroes.at(i)->increase_exp(0);
+        heroes.at(i)->increase_wealth(100);
+        heroes.at(i)->increase_exp(1000);
+        heroes.at(i)->restore_life(heroes.at(i)->get_health_capacity()/2);
+        heroes.at(i)->restore_mp(heroes.at(i)->get_magic_power_capacity()/2);
         heroes.at(i)->try_and_level_up();
+
     }
 }
 
@@ -2038,6 +2041,7 @@ Fight::Fight(Hero_Party* hero_party) : round_count(1), hero_party(hero_party)  {
             return;
         }
         if (!monster_party->in_fighting_condition())  {
+            print_battle("!!!!!!!!!!!!!Victory!!!!!!!!!!!!!","Gold and Experience awarded to heroes",true);
             hero_party->victory();
             break ;
         }
@@ -2046,6 +2050,7 @@ Fight::Fight(Hero_Party* hero_party) : round_count(1), hero_party(hero_party)  {
             return;
         }
         if (!hero_party->in_fighting_condition())  {
+            print_battle("^^^^^^^^^^^Defeat^^^^^^^^^","Gold coins have been reduced to half",true);
             hero_party->defeat();
             break ;
         }
@@ -2091,9 +2096,9 @@ void Fight::monsters_turn()  {
                 result_message.append("Hero evaded the attack");
             }
             print_battle(action_message,result_message,true);
-        }
-        if (quit_game)  {
-            return ;
+            if (quit_game)  {
+                return;
+            }
         }
     }
 }
@@ -2107,8 +2112,14 @@ void Fight::heroes_turn()  {
         hero_party->get_hero(i)->set_turn_to(true);
     }
     print_battle("Heroes Turn","",true);
+    if (quit_game)  {
+        return;
+    }
     while (hero_party->heroes_turn())  {
         print_battle(action,result,false);
+        if (!monster_party->in_fighting_condition())  {
+            return;
+        }
         if (hero_party->get_hero_in_control()->get_health()>0)  {  
             if (hero_party->get_hero_in_control()->get_turn())  {
                 std::cout << "1.Attack      2.Cast Spell      3.Equip Weapon      4.Equip Armor      5.Use Potion      6.Display Hero Stats      7.Display Monster Stats\n" ;
@@ -2221,7 +2232,17 @@ void Fight::heroes_turn()  {
             }
         }
     }
+    print_battle(action,result,true);
+    if (quit_game)  {
+        return;
+    }
+    if (!monster_party->in_fighting_condition())  {
+        return;
+    }
     print_battle("Monsters Turn","",true);
+    if (quit_game)  {
+        return;
+    }
 }
 
 void Fight::display_hero_stats()  {

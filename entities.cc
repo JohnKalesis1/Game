@@ -1,6 +1,3 @@
-//#include "entities.h"
-//#include <stdlib.h>
-//#include <iostream>
 #include <string>
 #include <list>
 #include <vector>
@@ -15,9 +12,9 @@ int main(int args,char *argv[])  {
     delete game;
 }
 
-static int quit_game=false;
+static int quit_game=false;//global variable which if set to true will stop the game cycle
 
-int count_digit(int number)  {
+int count_digit(int number)  {//a function to count how many digits a number has
     int count=0;
     while(number>0)  {
         number=number/10;
@@ -27,103 +24,122 @@ int count_digit(int number)  {
 
 }
 
-float series(int recursion,int agility)  {
-    if (recursion==agility)  {
-        return 0;
-    }
-    else  {
-        return 1.0/(float)recursion+2*series(recursion+1,agility);
-    }
+//Below are many functions which are the return the values of a every object in the game(better to have them all together for future changes in order to balance the game)
+//No need to focus on them, the final functions were made through experimentation
+
+float evasion(int agility)  {
+    return (float)agility/100.0;
 }
 
 int high_stat_random_value()  {
-    return 10;
+    return 9+rand()%2;
 }
 
 int low_stat_random_value()  {
-    return 6;
+    return 6+rand()%2;
 }
 
 int get_effect_duration(int level)  {
-    return 4;
+    return 4*((level-1)*0.05+1);
 }
 
 float get_effect_percentage(int level)  {
-    return 0.1;
+    return 0.1*((level-1)*0.1+1);
 }
 
 int high_attack_random_value()  {
-    return 25;
+    return 10+rand()%2;
 }
 
 int low_attack_random_value()  {
-    return 10;
+    return 6+rand()%2;
 }
 
 int high_defense_random_value()  {
-    return 10;
+    return 10+rand()%2;
 }
 
 int low_defense_random_value()  {
-    return 10;    
+    return 7+rand()%2;    
 }
 
 float high_evasion_random_value()  {
-    return 5.0;
+    return 0.1;
 }
 
 float low_evasion_random_value()  {
-    return 2.0;    
+    return 0.5;    
 }
 
 int get_random_number_of_wares()  {
-    return 10;
+    return 5+rand()%3;
 }
 
 int get_pseudo_random_level()  {
-    return 1+rand()%2;
-}
-
-int get_weapon_attack(int level,bool two_handed)  {
-    return 200;
-}
-
-int get_armor_defense(int level)  {
-    return 6;    
-}
-
-int get_gear_price(int level)  {
-    return 0;
-}
-int get_potion_effect(int level,int type)  {
-    return 10;    
-}
-
-int get_weapon_armor_price(int level)  {
-    return 10;
-}
-
-int get_potion_price(int level)  {
+    if (rand()%3)  {
+        return 1+rand()%10;
+    }
     return 1;
 }
 
+int get_weapon_attack(int level,bool two_handed)  {
+    if (two_handed)  {
+        return (9+rand()%2)*(level*0.1+1);
+    }
+    else  {
+        return (6+rand()%2)*(level*0.1+1);
+    }
+}
+
+int get_armor_defense(int level)  {
+    return (4+rand()%2)*(level*0.1+1);    
+}
+
+int get_potion_effect(int level,int type)  {
+    if (type>1)  {
+        return (level*0.2+1);
+    }
+    else if (type==1) {
+        return (2+rand()%3)*2;
+    }
+    else if (type==0)  {
+        return (2+rand()%3)*2;
+    }
+}
+
+int get_weapon_armor_price(int level)  {
+    return (level*0.4+1)*25;
+}
+
+int get_potion_price(int level,int type)  {
+    if (type>1)  {
+        return (level*0.4+1)*20;
+    }
+    else if (type==1) {
+        return (level*0.4+1)*8;
+    }
+    else if (type==0)  {
+        (level*0.4+1)*12;
+    }
+}
+
 int get_spell_price(int level)  {
-    return 4;
+    return (level*0.4+1)*30;
 }
 
 int get_mp_usage(int level)  {
-    return 19;
+    return (level*0.4+1)*5;
 }
 
-int get_spell_damage(int level,int mp_cost)  {
-    return 20;
+int get_spell_damage(int level)  {
+    return (12+rand()%2)*(level*0.1+1);
 }
 
 int damage_value(int average_damage)  {
-    return 9*((float)average_damage/10.0)+2*rand()%(average_damage/10);
+    return 9*((float)average_damage/10.0)+(rand()%3)*((int)((float)average_damage/10.0));
 }
 
-bool check_number(std::string str) {
+bool check_number(std::string str) {//asserts wheter a string is eligible for a conversion to a number
     for (int i = 0; i < str.length(); i++)  {
         if (isdigit(str[i]) == false)  {
             return false;
@@ -132,8 +148,8 @@ bool check_number(std::string str) {
     return true;
 }
 
-namespace names_and_sketches {
-    std::string Dragon_components[11]={
+namespace names_and_sketches {//some jaw-dropping original sketches whose cuteness are one of the main selling points of the game ^-^
+    std::string Dragon_components[11]={//goofy looking but immeasurably powerful 
     "       ||       ||       ",
     "       |||_____|||       ",
     "         ||~ ~||         ",
@@ -145,7 +161,7 @@ namespace names_and_sketches {
     "       (---------)       ",
     "        (-------)        ",
     "          ^   ^          "};
-    std::string Exoskeleton_components[11]={
+    std::string Exoskeleton_components[11]={//skip leg day macho
     "           ^  ^          ",        
     "          (*--*)         ",
     "     ______||||_____     ",
@@ -157,7 +173,7 @@ namespace names_and_sketches {
     "          |   |          ",
     "          |   |          ",
     "         _|   |_         "};
-    std::string Spirit_components[11]={
+    std::string Spirit_components[11]={//snake deer hybrid scared of combat 
     "  {                 }    ",
     "   {}{}         {}{}     ",
     "      |_________|        ",
@@ -169,7 +185,7 @@ namespace names_and_sketches {
     "         ||      ||==>   ",
     "          ||    ||       ",
     "           ||==||        ",};    
-    std::string Sorcerer_components[11]={
+    std::string Sorcerer_components[11]={//nerdy wizard
     "           |||           ",
     "          |||||          ",
     "      ___|||||||___      ",
@@ -181,7 +197,7 @@ namespace names_and_sketches {
     "           | |           ",
     "           | |           ",
     "           & &           "};
-    std::string Warrior_components[11]={
+    std::string Warrior_components[11]={//karate man
     "         ^     ^         ",
     "         |^___^|         ",
     "       <=|||||||=>       ",
@@ -193,7 +209,7 @@ namespace names_and_sketches {
     "          {| |}          ",
     "         {|   |}         ",
     "          &   &          "};
-    std::string Paladin_components[11]={
+    std::string Paladin_components[11]={//ex-solder turned priest  
     "         |||+|||         ",
     "         |||||||         ",
     "         |(^ ^)|         ",
@@ -229,6 +245,7 @@ namespace names_and_sketches {
     "            O            ",
     "            o            ",
     "                         "};
+    //Below are a lot of names and functions to get a random one of those available
     std::string hero_names[98]={"Abbathor","Aerdrie Faenya","Arvoreen","Baervan Wildwanderer","Baravar Cloakshadow","Berronar Truesilver","Brandobaris","Callarduran Smoothhands","Charmalaine","Clangeddin Silverbeard","Corellon Larethian","Cyrrollalee","Deep Sashelas","Dugmaren Brightmantle","Dumathoin","Ehlonna","Erevan Ilesere","Fenmarel Mestarine","Fharlanghn","Flandal Steelskin","Gadhelyn","Gaerdal Ironhand","Garl Glittergold","Gendwar Argrim","Halani Celanil","Heironeous","Labelas Enoreth","Moradin","Muamman Duathal","Olidammara","Pelor","Rillifane Rallathil","Roykyn","Segojan Earthcaller","Sehanine Moonbow","Sheela Peryroyl","Solonor Thelandira","St. Cuthbert","Urdlen","Urogalan","Vergadain","Ye'Cind","Yondalla","Annam","Bahamut","Blibdoolpoolp","Diirinka","Eadro","Gruumsh","Hruggek","Ilsensine","Jubilex","Kurtulmak","Laduguer","Loagzed","Lolth","Maglubiyet","Merrshaulk","Orcus","Sekolah","Semuanya","Shekinester","Skerrit","Stronmaus","Tiamat","Vaprak","Yeenoghu","Aasterinian","Bagrivyek","Bahgtru","Chronepsis","Doresain","Falazure","Gaknulak","Grankhul","Great Mother","Grolantor","Hiatea","Iallanis","Ilneval","Io","Karontor","Kiaransalee","Khurgorbaeyag","Luthic","Memnor","Nomog-Geaya","Panzuriel","Raxivort","Shargaas","Sixin","Skoraeus Stonebones","Squerrik","Surtr","Thrym","Vhaeraun","Yurtrus","Zinzerena"};
     std::string monster_names[102]={"Insane Daoist","A not so evil monster","Hellman","Tainthound","Dustfiend","Nethertree","The Grim Wraith","The Blissful Corpse","The Disgusting Phenomenon","The Amphibian Razor Hyena","The Grisly Ash Fiend","The Grisly Thunder Anaconda","Vileling","Plagueling","Stenchgolem","Fetidling","The Agitated Mumbler","The Dangerous Wraith","The Blissful Anomaly","The Brutal Berserker Gargoyle","The Grisly Vampire Lynx","The Tattooed Storm Bison","Vortexsnake","Abysssnake","Brineserpent","Acidfigure","The Monstrous Weirdo","The Ancient Tree","The Mad Shrieker","The Greater Ash Lion","The Elusive Killer Buffalo","The Raging Demon Drake","Blightwing","Cavernfoot","Cavehound","Wisphound","The Anguished Screamer","The Empty Brute","The Grumpy Lich","The Feathered Phantom Pig","The Vicious Hunting Owl","The Greater Warp Rat","Vilecreep","Plaguehand","Spectralteeth","Wispmask","The Defiant Horror","The Haunting Screamer","The Brown Plant","The Mad Tomb Buffalo","The Scarred Mist Cobra","The Ivory Blaze Freak","Corpsesnake","Gloomgolem","Cloudscreamer","Foulteeth","The Muted Vision","The Blind Ooze","The Bold Tumor","The Feathered Tomb Dragon","The Vicious Bane Crocodile","The Bloodthirsty Ash Bat","Nightsword","Infernotooth","Plaguecrackle","Smokefreak","The Canine Ooze","The Undead Phenomenon","The Wretched Behemoth","The Fiery Demon Bull","The Crimson Killer Viper","The Long-Horned Razor Scorpion","Gallghoul","Grievehood","Murkboy","Smogwing","The Disfigured Creeper","The Quiet Plant","The Active Weirdo","The Burnt Corpse Cobra","The Taloned Rot Crocodile","The Savage Slayer Hippo","Gallwings","Mournspawn","Mistflayer","Umbrawings","The Aged Ooze","The White Deviation","The Bronze Abnormality","The Ruthless Bone Bison","The Titanium Vampire Elephant","The Feral Harlequin Vermin","Nethercat","Smogstep","Thorntalon","Chaosbody","The Bold Ooze","The Brown Miscreation","The Barren Weirdo","The Tattooed Phantom Leviathan","The Painted Tomb Crocodile","The Burnt Raptor Warthog"};
     std::string potion_names[66]={"Potion","Hi-Potion","X-Potion","Mega-Potion","Ether","Turbo Ether","Elixir","Megalixir","Phoenix Down","Mega Phoenix","Antidote","Echo Screen","Eye Drops","Holy Water","Remedy","Soft","Al Bhed Potion","Heset Water","Tetra Elemental","Candle of Life","Dream Powder","Farplane Shadow","Farplane Wind","Frag Grenade","Silence Grenade","Sleeping Powder","Smoke Bomb","Petrify Grenade","Poison Fang","Blessed Gem","Dark Matter","Shadow Gem","Shining Gem","Supreme Gem","Gold Hourglass","Heset Spring","Light Curtain","Lunar Curtain","Mana Spring","Mana Tablet","Mana Tonic","Purifying Salt","Silver Hourglass","Soul Spring","Stamina Spring","Stamina Tablet","Stamina Tonic","Star Curtain","Three Stars","Twin Stars","Ability Distiller","Amulet","Designer Wallet","Door to Tomorrow","Gambler's Spirit","Hypello Potion","Mana Distiller","Map","Musk","Pendulum","Power Distiller","Shining Thorn","Speed Distiller","Underdog's Secret","Wings to Discovery","Winning Formula"};
@@ -238,7 +255,7 @@ namespace names_and_sketches {
     std::string get_random_hero_name() {
         return hero_names[rand()%98];
     }
-    std::string get_random_monster_name() {
+    std::string get_random_monster_name() {//each time we give a name to an object, this name is replaced by and "-" so that it is not given again to another object
         std::string possible_names[100];
         int possibility_counter=0;
         for (int i=0;i<100;i++)  {
@@ -431,11 +448,11 @@ int Potion::get_boost()  {
 //////////////////////////////////////////////////////Spell//////////////////////////////////////////////
 
 int Spell::initiate_spell(Monster* monster,int dexterity)  {
-    int attack_successful=monster->receive_damage(avg_damage+dexterity);
-    if (attack_successful>=0)  {
+    int attack_successful=monster->receive_damage(avg_damage+dexterity);//attack the enemy with the spell (will return -1 if evaded or a positive number dictating the damage it did)
+    if (attack_successful>=0)  {//if attack was not evaded, then apply the spell's debuff on the enemy
         monster->receive_debuff(effect);
     }
-    return attack_successful;
+    return attack_successful;//we return what was the result of the attack in order to display it in the action taken 
 }
 
 int Spell::get_lvl_requirement()  {
@@ -469,7 +486,7 @@ Effect& Spell::get_effect()  {
 //////////////////////////////////////////////////////LigthingSpell//////////////////////////////////////
 
 LigthingSpell::LigthingSpell(std::string name,int price,int lvl,int mp_usage,int damage) : Spell(name,price,lvl,mp_usage,damage,0) {
-    effect=Effect(get_effect_duration(lvl),get_effect_percentage(lvl),2);
+    effect=Effect(get_effect_duration(lvl),get_effect_percentage(lvl),2);//the numbers simply go to the type of effect the effect is
 }
 
 //////////////////////////////////////////////////////IceSpell//////////////////////////////////////////
@@ -504,7 +521,7 @@ int LivingBeing::get_level()  {
 }
 
 void LivingBeing::restore_life(int amount)  {
-    if (health+amount>=health_capacity)  {
+    if (health+amount>=health_capacity)  {//if amount healed adds up to more than max health, then set player health to max hp
         health=health_capacity;
     }
     else  {
@@ -516,18 +533,18 @@ void LivingBeing::restore_life(int amount)  {
 //////////////////////////////////////////////////////Hero//////////////////////////////////////////////
 
 Hero::Hero(std::string name,int health,int magic_power_capacity,int strength,int dexterity,int agility,int money,short hero_type)  : LivingBeing(name,health,1), magic_power_capacity(magic_power_capacity), magic_power(magic_power_capacity), strength(strength), base_strength(strength), base_dexterity(dexterity), dexterity(dexterity), base_agility(agility), agility(agility), money(money), hero_type(hero_type)  { 
-    evasion_chance=series(5,agility);
-    bool two_handed=((rand()%10)<5);
-    weapon=new Weapon(names_and_sketches::get_random_weapon_name(),get_gear_price(1),1,get_weapon_attack(1,two_handed),two_handed);
+    evasion_chance=evasion(agility);
+    bool two_handed=((rand()%10)<5);//when a hero is created he is given lvl 1 weapons and armor
+    weapon=new Weapon(names_and_sketches::get_random_weapon_name(),get_weapon_armor_price(1),1,get_weapon_attack(1,two_handed),two_handed);
     acquire_item(weapon);
     if (!two_handed)  {
-        armor=new Armor(names_and_sketches::get_random_armor_name(),get_gear_price(1),1,get_armor_defense(1));
+        armor=new Armor(names_and_sketches::get_random_armor_name(),get_weapon_armor_price(1),1,get_armor_defense(1));
         acquire_item(armor);
     }
 } 
 
 Hero::~Hero()  {
-    while (item_box.size()!=0)  {
+    while (item_box.size()!=0)  {//delete every item in the item box and likewise in the spells
         std::list<Item*>::iterator it=item_box.begin();
         Item* to_delete=it.operator*();
         item_box.erase(it);
@@ -597,8 +614,8 @@ void Hero::set_turn_to(bool status)  {
 }
 
 bool Hero::evade()  {
-    float random_float=(float)rand()/100.0;
-    if (random_float<evasion_chance)  {
+    float random_float=(float)rand()/(float)RAND_MAX;//get a random float between 0 and 1
+    if (random_float<evasion_chance)  {//if float is less than evasion chance then evade
         return true;
     }
     else  {
@@ -608,26 +625,27 @@ bool Hero::evade()  {
 
 bool Hero::try_and_level_up()  {
     bool flag=false;
-    while (experience>=((((float)level)/10.0)+1)*1000)  {
-        experience=experience-((((float)level)/10.0)+1)*1000;
+    while (experience>=((((float)level)/10.0)+1)*1000)  {//if experience is more or equal to the amount needed to level up
+        experience=experience-((((float)level)/10.0)+1)*1000;//reduce experience by that amount and level up 
         level_up();
         flag=true;
     }
-    return flag;
+    return flag;//returns true if hero succesfully leveled up
 }
 
-int Hero::cast_spell(Spell* spell,Monster* monster)  {
+int Hero::cast_spell(Spell* spell,Monster* monster)  {//whether hero has enough mp to cast the spell is done before the call of the function
+    magic_power=magic_power-spell->get_mp_usage();
     return spell->initiate_spell(monster,dexterity); 
 }
 
-void Hero::level_up()  {
+void Hero::level_up()  {//growth of hero
     level++;
-    agility=(int)(((float)(level-1))/10.0+1)*base_agility;
-    strength=(int)(((float)(level-1))/10.0+1)*base_strength;
-    dexterity=(int)(((float)(level-1))/10.0+1)*base_dexterity;
-    health_capacity=(int)(((float)(level-1))/10.0+1)*400;
-    magic_power_capacity=(int)(((float)(level-1))/10.0+1)*100;
-    evasion_chance=series(5,agility);
+    agility=0.5+ ((level-1)*0.3+1)*base_agility;
+    strength=0.5+ ((level-1)*0.3+1)*base_strength;
+    dexterity=0.5+ ((level-1)*0.3+1)*base_dexterity;
+    health_capacity=0.5+ ((level-1)*0.4+1)*20;
+    magic_power_capacity=0.5+ ((level-1)*0.5+1)*15;
+    evasion_chance=evasion(agility);
 }
 
 int Hero::attack(Monster* monster)  {
@@ -635,11 +653,11 @@ int Hero::attack(Monster* monster)  {
         return monster->receive_damage(weapon->attack()+strength);
     }
     else  {
-        return monster->receive_damage(strength);
+        return monster->receive_damage(strength);//bare fists attack
     }
 }
 
-void Hero::restore_mp(int amount)  {
+void Hero::restore_mp(int amount)  {//same as in hp restoration
     if (magic_power+amount>=magic_power_capacity)  {
         magic_power=magic_power_capacity;
     }
@@ -661,23 +679,23 @@ int Hero::receive_damage(int damage)  {
         return -1;
     }
     else  {
-        if (armor==NULL)  {
+        if (armor==NULL)  {//if no anmor equipped, take all the damage
             health=health-damage;
             if (health<0)  {
-                health=0;
+                health=0;//if damage is fatal set hero health to zero
             }
             return damage;
         }
         else  {
-            if (damage>armor->defend())  {
-                health=health+armor->defend()-damage;
+            if (damage>armor->defend())  {//if damage is greater than that of hero's defense
+                health=health+armor->defend()-damage;//reduce damage by that amount of defense and inflict it one hero
                 if (health<0)  {
                     health=0;
                 }
                 return damage-armor->defend();
             }
             else  {
-                return 0;
+                return 0;//else damage is nullified
             }
         }
     }
@@ -715,34 +733,36 @@ void Hero::unequip_armor()  {
 
 void Hero::use_potion(Potion* potion)  {
     potion->use(this);
-    Item* to_delete=remove_item(potion->get_name());
+    Item* to_delete=remove_item(potion->get_name());//since names are unique to an item, we use them to identify each item
     delete to_delete;
 }
 
 void Hero::receive_buff(short stat_affected,int boost)  {
-    switch (stat_affected)
-    {
-    case 0:
-        restore_life(boost);
-        break;
-    case 1:
-        restore_mp(boost);
-        break;
-    case 2:
-        strength=strength+boost;
-        break;
-    case 3:
-        dexterity=dexterity+boost;
-        break;
-    case 4:
-        agility=agility+boost;
-        break;
-    default:
-        break;
+    switch (stat_affected)  {//depending on the stat affected make the appropriate enhancements
+        case 0:
+            restore_life(boost);
+            break;
+        case 1:
+            restore_mp(boost);
+            break;
+        case 2:
+            strength=strength+boost;//increase actual strenght by set amount
+            base_strength=base_strength+(float)boost/(float)((level-1)*0.3+1);//in order for the change to stay after the level up, we also increase the hero's growth rate by same amount(this also makes the potions act as some kind of steroids since the increase the speed of stat growth... but lets just call it a feature ^~^)
+            break;
+        case 3:
+            dexterity=dexterity+boost;
+            base_dexterity=base_dexterity+(float)boost/(float)((level-1)*0.3+1);
+            break;
+        case 4:
+            agility=agility+boost;
+            base_agility=base_agility+(float)boost/(float)((level-1)*0.3+1);
+            break;
+        default:
+            break;
     }
 }
 
-Item* Hero::remove_item(std::string name)  {
+Item* Hero::remove_item(std::string name)  {//search item by it's unique name by iterating through the list and remove it before returning it
     std::list<Item*>::iterator it=item_box.begin();
     for (int i=0;i<item_box.size();i++)  {
         if (it.operator*()->get_name().compare(name)==0)  {
@@ -780,7 +800,7 @@ void Hero::acquire_spell(Spell* spell)  {
     spells.insert(spells.begin(),spell);
 }
 
-bool Hero::receive_input(char input)  {
+bool Hero::receive_input(char input)  {//handles inputs related to hero methods
     switch (input)  {
         case 'i'://check inventory
             return display_inventory();
@@ -804,29 +824,41 @@ bool Hero::receive_input(char input)  {
 }
 
 
-bool Hero::show_availabe_weapons_and_promt_for_swap(bool* turn,std::string* action)  {
-    bool wrong_action=false;
-    bool underleveled=false;
-    bool already_equipped=false;
-    bool successfully_equipped=false;
-    bool unequipped_armor=false;
-    std::string weapon_equipped;
-    while (true)  {
-        std::list<Item*>::iterator it=item_box.begin();
-        system("clear");
-        std::cout << "Hero name: " << name << " Lvl." << level <<'\n';
-        Weapon* choices[item_box.size()];
+bool Hero::show_availabe_weapons_and_promt_for_swap(bool* turn,std::string* action)  {//oh boy this will be hard...
+    bool wrong_action=false;//whether user pressed a wrong action
+    bool underleveled=false;//whether user tried to equip a weapon whith a higher level than his
+    bool already_equipped=false;//whether user tried to equip the same weapon
+    bool successfully_equipped=false;//set true on succesful equip
+    bool unequipped_armor=false;//whether the Weapon equip forced an Armor removal
+    std::string weapon_equipped;//name of weapon that was equipped
+    while (true)  {//inner loop for player choice of weapons
+        std::list<Item*>::iterator it=item_box.begin();//we will iterate over the item box in search of weapons
+        system("clear");//clear the terminal screen
+        std::cout << "Hero name: " << name ;//display hero name and occupation to make it easier to understand a hero's needs
+        switch (hero_type)  {
+            case 0:
+                std::cout << "(Warrior)";
+                break;
+            case 1:
+                std::cout << "(Paladin)";
+                break;
+            case 2:
+                std::cout << "(Sorcerer)";
+                break;
+        }
+        std::cout << " Lvl." << level <<'\n';
+        Weapon* choices[item_box.size()];//create an array of possible weapons
         int weapons_count=0;
         std::cout << "Weapons:\n";
         for (int i=0;i<item_box.size();i++)  {
-            if (it.operator*()->get_type_of_item()==0)  {
+            if (it.operator*()->get_type_of_item()==0)  {//if item is a weapon
                 Weapon* weapon_candidate=(Weapon*)it.operator*();
-                std::cout << weapons_count+1 <<"." << weapon_candidate->get_name();
-                choices[weapons_count]=weapon_candidate;
+                std::cout << weapons_count+1 <<"." << weapon_candidate->get_name();//display it (we add +1 in order to make the display more intuitive)
+                choices[weapons_count]=weapon_candidate;//add the weapon to the list of possble choices
                 weapons_count++;
                 if (weapon!=NULL)  {
                     if (weapon->get_name().compare(weapon_candidate->get_name())==0)  {
-                        std::cout << "(Equipped)";
+                        std::cout << "(Equipped)";//if its the one we have currently equipped, display the message
                     }
                 }
                 std::cout << '\n';
@@ -843,7 +875,7 @@ bool Hero::show_availabe_weapons_and_promt_for_swap(bool* turn,std::string* acti
             std::cout << "No available weapons\n";
         }
         std::cout << "\nSelect which weapon you want to equip:\n";
-        for (int i=0;i<weapons_count;i++)  {
+        for (int i=0;i<weapons_count;i++)  {//display possible actions 
             std::cout << i+1 <<"->"<<choices[i]->get_name();
             if (weapon!=NULL)  {
                 if (weapon->get_name().compare(choices[i]->get_name())==0)  {
@@ -857,7 +889,7 @@ bool Hero::show_availabe_weapons_and_promt_for_swap(bool* turn,std::string* acti
         }
         std::cout <<"(Armor category: c) (Go Back: b) (Switch Hero: h) (Quit game: q)\n";
         std::string input;
-        if (wrong_action)  {
+        if (wrong_action)  {//below are message for each action in the context of picking weapons the hero can take(in the case of the other actions their result is visible so there is no need to show anything)
             std::cout<< "Option not valid. ";
             wrong_action=false;
         }
@@ -881,32 +913,35 @@ bool Hero::show_availabe_weapons_and_promt_for_swap(bool* turn,std::string* acti
         }
         std::cout << "Please enter an action:";
         std::cin >> input; 
-        if (check_number(input))  {
-            int pick=atoi(input.c_str())-1;
-            if (pick<weapons_count && pick>=0)  {
-                if (choices[pick]->get_lvl_requirement()<=level)  {
-                    if (weapon!=NULL)  {
+        if (check_number(input))  {//if input is a number(meaning user tried to select a weapon)
+            int pick=atoi(input.c_str())-1;//make the input into an integer and make it fit to function as an array index 
+            if (pick<weapons_count && pick>=0)  {//if number is withing bounds of weapons presented proceed
+                if (choices[pick]->get_lvl_requirement()<=level)  {//if not underleveled, proceed to equip it
+                    if (weapon!=NULL)  {//if a weapon is already equipped
                         if (choices[pick]->get_name().compare(weapon->get_name())==0)  {
-                            already_equipped=true;
-                            continue;
+                            already_equipped=true;//watch out for already equipped scenario
+                            continue;//procced with loop, in order to make any scenarios become visible
                         }
                         else  {
                             weapon_equipped=choices[pick]->get_name();
-                            unequipped_armor=replace_weapon(choices[pick]);
+                            unequipped_armor=replace_weapon(choices[pick]);//replace weapon, which returns true if armor was unequipped
                             successfully_equipped=true;
-                            if (turn!=NULL)  {
+                            if (turn!=NULL)  {//if this is happening while in a fight, end user's turn after he has finished with weapon swapping 
                                 *turn=false;
                             }
-                            if (action!=NULL)  {
+                            if (action!=NULL)  {//likewise if it is happening in a fight, create the message of the action taken
                                 *action=get_name();
                                 action->append(" equipped ");
                                 action->append(choices[pick]->get_name());
-                                return true;
+                                if (unequipped_armor)  {
+                                    action->append(". Armor unequipped");
+                                }
+                                return true;//if in a fight and user consumed turn return true, which will indicate a hero swap
                             }
                             continue;
                         }
                     }
-                    else  {
+                    else  {//case of no weapon
                         weapon_equipped=choices[pick]->get_name();
                         unequipped_armor=replace_weapon(choices[pick]);
                         successfully_equipped=true;
@@ -926,11 +961,11 @@ bool Hero::show_availabe_weapons_and_promt_for_swap(bool* turn,std::string* acti
                     }
                 }
                 else  {
-                    underleveled=true;
+                    underleveled=true;//trigger underleveled scenario
                     continue;
                 }
             }
-            else  {
+            else  {//else wrong action
                 wrong_action=true;
                 continue;
             }
@@ -938,16 +973,16 @@ bool Hero::show_availabe_weapons_and_promt_for_swap(bool* turn,std::string* acti
         else  {
             if (input.compare("q")==0)  {
                 quit_game=true;
-                return false;
+                return false;//a false statement here plays no major role, since with the quit game flag set to true, the game will stop
             }
             else if (input.compare("b")==0)  {
-                return false;
+                return false;//by returning false we signify that no hero swap must be made afterwards(only takes effect in a fight)
             }
             else if (input.compare("c")==0)  {
-                return show_availabe_armors_and_promt_for_swap();
+                return show_availabe_armors_and_promt_for_swap();//show armors
             }
             else if (input.compare("h")==0)  {
-                return true;
+                return true;//return true indicating to change hero
             }
             else  {
                 wrong_action=true;
@@ -957,7 +992,7 @@ bool Hero::show_availabe_weapons_and_promt_for_swap(bool* turn,std::string* acti
     }
 }
 
-bool Hero::show_availabe_armors_and_promt_for_swap(bool * turn,std::string* action)  {
+bool Hero::show_availabe_armors_and_promt_for_swap(bool * turn,std::string* action)  {//almost identical to the above
     bool wrong_action=false;
     bool underleveled=false;
     bool already_equipped=false;
@@ -967,7 +1002,19 @@ bool Hero::show_availabe_armors_and_promt_for_swap(bool * turn,std::string* acti
     while (true)  {
         std::list<Item*>::iterator it=item_box.begin();
         system("clear");
-        std::cout << "Hero name: " << name << " Lvl." << level <<'\n';
+        std::cout << "Hero name: " << name ;
+        switch (hero_type)  {
+            case 0:
+                std::cout << "(Warrior)";
+                break;
+            case 1:
+                std::cout << "(Paladin)";
+                break;
+            case 2:
+                std::cout << "(Sorcerer)";
+                break;
+        }
+        std::cout << " Lvl." << level <<'\n';
         Armor* choices[item_box.size()];
         int armors_count=0;
         std::cout << "Armors:\n";
@@ -1114,7 +1161,7 @@ bool Hero::show_availabe_armors_and_promt_for_swap(bool * turn,std::string* acti
     }
 }
 
-bool Hero::show_availabe_potions_and_promt_for_use(bool * turn,std::string* action)  {
+bool Hero::show_availabe_potions_and_promt_for_use(bool * turn,std::string* action)  {//same structure as the above
     bool wrong_action=false;
     bool underleveled=false;
     bool successful_use=false;
@@ -1123,7 +1170,19 @@ bool Hero::show_availabe_potions_and_promt_for_use(bool * turn,std::string* acti
     while (true)  {
         std::list<Item*>::iterator it=item_box.begin();
         system("clear");
-        std::cout << "Hero name: " << name << " Lvl." << level << " Magic Power: "<<magic_power << "/" <<magic_power_capacity <<'\n';
+        std::cout << "Hero name: " << name ;
+        switch (hero_type)  {
+            case 0:
+                std::cout << "(Warrior)";
+                break;
+            case 1:
+                std::cout << "(Paladin)";
+                break;
+            case 2:
+                std::cout << "(Sorcerer)";
+                break;
+        }
+        std::cout << " Lvl." << level << " Magic Power: "<<magic_power << "/" <<magic_power_capacity <<'\n';
         Potion* potion_choices[item_box.size()];
         int potions_count=0;
         std::cout << "Potions:\n";
@@ -1241,15 +1300,27 @@ bool Hero::show_availabe_potions_and_promt_for_use(bool * turn,std::string* acti
     }
 }
 
-bool Hero::display_inventory()  {
+bool Hero::display_inventory()  {//either shows items or spells 
     bool wrong_action=false;
     bool underleveled=false;
-    bool item_or_spell=true;
+    bool item_or_spell=true;//thus a boolean to switch between the two sections is vital
     while (true)  {
-        if (item_or_spell)  {
+        if (item_or_spell)  {//item section, which shows every item in item box in a similar way as the previous methods(a lot of copy pasting was at play here...)
             std::list<Item*>::iterator it=item_box.begin();
             system("clear");
-            std::cout << "Hero name: " << name << " Lvl." << level << " Gold: "<<money <<'\n';
+            std::cout << "Hero name: " << name;
+            switch (hero_type)  {
+                case 0:
+                    std::cout << "(Warrior)";
+                    break;
+                case 1:
+                    std::cout << "(Paladin)";
+                    break;
+                case 2:
+                    std::cout << "(Sorcerer)";
+                    break;
+            }
+            std::cout << " Lvl." << level << " Gold: "<<money <<'\n';
             Item* item_choices[item_box.size()];
             int items_count=0;
             std::cout << "Items:\n";
@@ -1325,7 +1396,7 @@ bool Hero::display_inventory()  {
                 return false;
             }
             else if (input.compare("c")==0)  {
-                item_or_spell=false;
+                item_or_spell=false;//change to spell section
                 continue;
             }
             else if (input.compare("h")==0)  {
@@ -1340,7 +1411,19 @@ bool Hero::display_inventory()  {
             std::list<Spell*>::iterator it2=spells.begin();
             Spell* spell_choices[spells.size()];
             system("clear");
-            std::cout << "Hero name: " << name << " Lvl." << level << " Gold: "<<money <<'\n';
+            std::cout << "Hero name: " << name ;
+            switch (hero_type)  {
+                case 0:
+                    std::cout << "(Warrior)";
+                    break;
+                case 1:
+                    std::cout << "(Paladin)";
+                    break;
+                case 2:
+                    std::cout << "(Sorcerer)";
+                    break;
+            }
+            std::cout <<" Lvl." << level << " Gold: "<<money <<'\n';
             int spells_count=0;
             std::cout << "Spells:\n";
             Spell* spell;
@@ -1402,7 +1485,7 @@ bool Hero::display_inventory()  {
                 return false;
             }
             else if (input.compare("c")==0)  {
-                item_or_spell=true;
+                item_or_spell=true;//switch to items category
                 continue;
             }
             else if (input.compare("h")==0)  {
@@ -1416,10 +1499,10 @@ bool Hero::display_inventory()  {
     }
 }
 
-bool Hero::show_availabe_spells_and_promt_for_activation(bool* turn,std::string* action,std::string* result,Fight* fight)  {
+bool Hero::show_availabe_spells_and_promt_for_activation(bool* turn,std::string* action,std::string* result,Fight* fight)  {//in comparison to the other cases, the spell prompt "window" will always be related to a fight
     bool wrong_action=false;
     bool underleveled=false; 
-    bool not_enough_mp=false;
+    bool not_enough_mp=false;//scenario of not enought magic power to cast spell
     while (true)  {
         std::list<Spell*>::iterator it=spells.begin();
         Spell* spell_choices[spells.size()];
@@ -1427,7 +1510,7 @@ bool Hero::show_availabe_spells_and_promt_for_activation(bool* turn,std::string*
         std::cout << "Hero name: " << name << " Lvl." << level << " Magic Power: "<<magic_power <<'\n';
         std::cout << "Spells:\n";
         Spell* spell;
-        for (int i=0;i<spells.size();i++)  {
+        for (int i=0;i<spells.size();i++)  {//show each available spell
             if (it.operator*()->get_type_of_spell()==2)  {
                 spell=it.operator*();
                 std::cout << i+1 <<"." << spell->get_name()<<"(Ligthing Spell)";
@@ -1465,7 +1548,7 @@ bool Hero::show_availabe_spells_and_promt_for_activation(bool* turn,std::string*
         }
         else  {
             std::cout << "\nSelect which spell you want to cast:\n";
-            for (int i=0;i<spells.size();i++)  {
+            for (int i=0;i<spells.size();i++)  {//similar to the other functions, show related key presses in order to cast specific spell
                 std::cout << i+1 <<"->"<<spell_choices[i]->get_name();
                 if (spell_choices[i]->get_lvl_requirement()>level)  {
                     std::cout << "(Level "<<spell_choices[i]->get_lvl_requirement() <<" required)";
@@ -1475,7 +1558,7 @@ bool Hero::show_availabe_spells_and_promt_for_activation(bool* turn,std::string*
        }
         std::cout <<"(Go Back: b) (Switch Hero: h) (Quit game: q)\n";
         std::string input;
-        if (wrong_action)  {
+        if (wrong_action)  {//scenarios for spell error messages
             std::cout<< "Option not valid. ";
             wrong_action=false;
         }
@@ -1492,49 +1575,58 @@ bool Hero::show_availabe_spells_and_promt_for_activation(bool* turn,std::string*
         if (check_number(input))  {
             int choice=atoi(input.c_str())-1;
             if (choice<spells.size() && choice>=0)  {
-                Monster* monster_to_attack=fight->show_available_targets();
-                if (monster_to_attack!=NULL)  {
-                    *turn=false;
-                    int succesfull_hit=cast_spell(spell_choices[choice],monster_to_attack);
-                    *action=name;
-                    action->append(" casted spell on ");
-                    action->append(monster_to_attack->get_name());
-                    if (succesfull_hit==-1)  {
-                        *result="Spell evaded";
-                    }
-                    else if (succesfull_hit==0)  {
-                        *result="Monster's defense too high, damage nullified. Monster afflicted with";
-                        switch (spell_choices[choice]->get_type_of_spell())  {
-                            case 0:
-                                result->append(" Chilled ");
-                                break;
-                            case 1:
-                                result->append(" Burned ");
-                                break;
-                            case 2:
-                                result->append(" Shocked ");
-                                break;
+                if (spell_choices[choice]->get_mp_usage()>magic_power)  {
+                    not_enough_mp=true;//if not enought mp, display related scenario
+                    continue;
+                }
+                else  {//after making a choice of which spell to use, a new window will appear in order for user to pick a target 
+                    Monster* monster_to_attack=fight->show_available_targets();
+                    if (monster_to_attack!=NULL)  {//if a target was chosen
+                        *turn=false;
+                        int succesfull_hit=cast_spell(spell_choices[choice],monster_to_attack);//returns -1 if evaded or a positive number dictating the damage dealt. Based on that create action and result messages
+                        *action=name;
+                        action->append(" casted spell on ");
+                        action->append(monster_to_attack->get_name());
+                        if (succesfull_hit==-1)  {//
+                            *result="Spell evaded";
                         }
-                        result->append("status effect");
-                    }
-                    else if (succesfull_hit>0)  {
-                        *result="Inflicted ";
-                        result->append(std::to_string(succesfull_hit));
-                        result->append(" damage. Monster afflicted with ");
-                        switch (spell_choices[choice]->get_type_of_spell())  {
-                            case 0:
-                                result->append(" Chilled ");
-                                break;
-                            case 1:
-                                result->append(" Burned ");
-                                break;
-                            case 2:
-                                result->append(" Shocked ");
-                                break;
+                        else if (succesfull_hit==0)  {
+                            *result="Monster's defense too high, damage nullified. Monster afflicted with";
+                            switch (spell_choices[choice]->get_type_of_spell())  {
+                                case 0:
+                                    result->append(" Chilled ");
+                                    break;
+                                case 1:
+                                    result->append(" Burned ");
+                                    break;
+                                case 2:
+                                    result->append(" Shocked ");
+                                    break;
+                            }
+                            result->append("status effect");
                         }
-                        result->append("status effect");
+                        else if (succesfull_hit>0)  {
+                            *result="Inflicted ";
+                            result->append(std::to_string(succesfull_hit));
+                            result->append(" damage. Monster afflicted with ");
+                            switch (spell_choices[choice]->get_type_of_spell())  {
+                                case 0:
+                                    result->append(" Chilled ");
+                                    break;
+                                case 1:
+                                    result->append(" Burned ");
+                                    break;
+                                case 2:
+                                    result->append(" Shocked ");
+                                    break;
+                            }
+                            result->append("status effect");
+                        }
+                        return true;
                     }
-                    return true;
+                    else  {//a monster was not selected, user is taken to the spell selection
+                        continue;
+                    }
                 }
             }
         }
@@ -1556,7 +1648,7 @@ bool Hero::show_availabe_spells_and_promt_for_activation(bool* turn,std::string*
     }
 }
 
-bool Hero::display_stats()  {
+bool Hero::display_stats()  {//nothing much to see here
     bool wrong_action=false;
     while (true)  {
         system("clear");
@@ -1618,29 +1710,29 @@ short Hero::get_hero_type()  {
 
 //////////////////////////////////////////////////////Warrior////////////////////////////////////////
 
-Warrior::Warrior(std::string name) : Hero(name,400,100,high_stat_random_value(),low_stat_random_value(),high_stat_random_value(),100,0)  {}
+Warrior::Warrior(std::string name) : Hero(name,20,15,high_stat_random_value(),low_stat_random_value(),high_stat_random_value(),100,0)  {}
 
 //////////////////////////////////////////////////////Paladin////////////////////////////////////////
 
-Paladin::Paladin(std::string name) : Hero(name,400,100,high_stat_random_value(),high_stat_random_value(),low_stat_random_value(),100,1)  {}
+Paladin::Paladin(std::string name) : Hero(name,20,15,high_stat_random_value(),high_stat_random_value(),low_stat_random_value(),100,1)  {}
 
 //////////////////////////////////////////////////////Sorcerer////////////////////////////////////////
 
-Sorcerer::Sorcerer(std::string name) : Hero(name,400,100,low_stat_random_value(),high_stat_random_value(),high_stat_random_value(),100,2)  {}
+Sorcerer::Sorcerer(std::string name) : Hero(name,20,15,low_stat_random_value(),high_stat_random_value(),high_stat_random_value(),100,2)  {}
 
 //////////////////////////////////////////////////////Monster////////////////////////////////////////
 
-Monster::Monster(std::string name,int avg_damage,int defense,int evasion_chance,int lvl,short monster_type) : LivingBeing(name,(int)(((float)(lvl-1))/10.0+1)*520,lvl), avg_damage(avg_damage), defense(defense), evasion_chance(evasion_chance), monster_type(monster_type) {
+Monster::Monster(std::string name,int avg_damage,int defense,int evasion_chance,int lvl,short monster_type) : LivingBeing(name,(int)(((float)(lvl-1))*0.4+1)*25,lvl), avg_damage(avg_damage), defense(defense), evasion_chance(evasion_chance), monster_type(monster_type) {
     for (int i=0;i<3;i++)  {
-        effects.push_back(Effect());
-    }
+        effects.push_back(Effect());//when monsters are created, we also create an non impactfull Effect to act as a placeholder for when we want to swap with another Effect of the same type
+    }                               //meaning that if a monster is already affected with a -20% damage decrease debuff, then when a -10% damage decrease debuff comes, it will overwite the previous one(meaning that effects of the same type can't stack...that would be too overpowered)
 }
 
 Monster::~Monster()  {
 
 }
 
-bool Monster::display_stats()  {
+bool Monster::display_stats()  {//similar process to that of hero's stats with the addition that we show any active debuffs
     bool wrong_action=false;
     int debuffs_active=0;
     while (true)  {
@@ -1726,7 +1818,7 @@ bool Monster::display_stats()  {
 }
 
 int Monster::attack(Hero* hero)  {
-    if (effects.at(0).is_active())  {
+    if (effects.at(0).is_active())  {//if the damage decrease is active, take it into account 
         return hero->receive_damage(effects.at(0).apply_effect(damage_value(avg_damage)));
     }
     else  {
@@ -1735,10 +1827,10 @@ int Monster::attack(Hero* hero)  {
 }
 
 bool Monster::evade()  {
-    float random_float=(float)rand()/100.0;
+    float random_float=(float)rand()/(float)RAND_MAX;
     float true_evasion_chance;
     if (effects.at(2).is_active())  {
-            true_evasion_chance=effects.at(2).apply_effect(evasion_chance);
+            true_evasion_chance=effects.at(2).apply_effect(evasion_chance);//if reduced evasion devuff is active, apply it
         }
         else  {
             true_evasion_chance=evasion_chance;
@@ -1757,7 +1849,7 @@ int Monster::receive_damage(int damage)  {
     }
     else  {
         int true_defense;
-        if (effects.at(1).is_active())  {
+        if (effects.at(1).is_active())  {//if reduced defense debuff is active, apply it
             true_defense=effects.at(1).apply_effect(defense);
         }
         else  {
@@ -1777,12 +1869,12 @@ int Monster::receive_damage(int damage)  {
 }
 
 void Monster::receive_debuff(Effect& effect)  {
-    effects.at(effect.get_stat_affected())=effect;
+    effects.at(effect.get_stat_affected())=effect;//overwrite an effect with one of the same type(only one effect of each type can be active at once)
 }
 
 void Monster::round_passes()  {
     for (int i=0;i<3;i++)  {
-        effects.at(i).reduce_duration();
+        effects.at(i).reduce_duration();//at each round an effect's duration is reduced, thus making it inactive after a few rounds
     }
 }
 
@@ -1792,21 +1884,21 @@ short Monster::get_monster_type()  {
 
 //////////////////////////////////////////////////////Dragon////////////////////////////////////////
 
-Dragon::Dragon(std::string name,int lvl) : Monster(name,high_attack_random_value()*(((float)(lvl-1))/10.0+1),low_defense_random_value()*(((float)(lvl-1))/10.0+1),low_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl,0)  {}
+Dragon::Dragon(std::string name,int lvl) : Monster(name,high_attack_random_value()*(((float)(lvl-1))*0.3+1),low_defense_random_value()*(((float)(lvl-1))*0.3+1),low_evasion_random_value()*(((float)(lvl-1))*0.3+1),lvl,0)  {}
 
 //////////////////////////////////////////////////////Exoskeleton////////////////////////////////////////
 
-Exoskeleton::Exoskeleton(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))/10.0+1),high_defense_random_value()*(((float)(lvl-1))/10.0+1),low_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl,1)  {}
+Exoskeleton::Exoskeleton(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))*0.3+1),high_defense_random_value()*(((float)(lvl-1))*0.3+1),low_evasion_random_value()*(((float)(lvl-1))*0.3+1),lvl,1)  {}
 
 
 //////////////////////////////////////////////////////Spirit////////////////////////////////////////
 
-Spirit::Spirit(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))/10.0+1),low_defense_random_value()*(((float)(lvl-1))/10.0+1),high_evasion_random_value()*(((float)(lvl-1))/10.0+1),lvl,2)  {}
+Spirit::Spirit(std::string name,int lvl) : Monster(name,low_attack_random_value()*(((float)(lvl-1))*0.3+1),low_defense_random_value()*(((float)(lvl-1))*0.3+1),high_evasion_random_value()*(((float)(lvl-1))*0.3+1),lvl,2)  {}
 
 //////////////////////////////////////////////////////Hero_Party////////////////////////////////////////
 
 Hero_Party::Hero_Party(int starting_x_pos,int starting_y_pos,int number_of_heroes) : hero_in_control(0), x_pos(starting_x_pos), y_pos(starting_y_pos) {
-    for (int i=0;i<number_of_heroes;i++)  {
+    for (int i=0;i<number_of_heroes;i++)  {//randomly create some heroes
         switch (rand()%3)  {
             case 0:
                 heroes.push_back(new Warrior(names_and_sketches::get_random_hero_name()));
@@ -1848,13 +1940,13 @@ int Hero_Party::get_y_position()  {
 void Hero_Party::prepare_for_next_round()  {
     for (int i=0;i<heroes.size();i++)  {
         if (heroes.at(i)->get_health()>0)  {
-            heroes.at(i)->restore_life(heroes.at(i)->get_health_capacity()/5);
-            heroes.at(i)->restore_mp(heroes.at(i)->get_magic_power_capacity()/6);
+            heroes.at(i)->restore_life(heroes.at(i)->get_health_capacity()/10);//restore 10% health
+            heroes.at(i)->restore_mp(heroes.at(i)->get_magic_power_capacity()/8);//restore 12.5% magic power
         }
     }
 }
 
-bool Hero_Party::heroes_turn()  {
+bool Hero_Party::heroes_turn()  {//if any of the heroes has a turn left returns true
     bool to_return=0;
     for (int i=0;i<heroes.size();i++)  {
         to_return=to_return || heroes.at(i)->get_turn();
@@ -1862,7 +1954,7 @@ bool Hero_Party::heroes_turn()  {
     return to_return;
 }
 
-bool Hero_Party::in_fighting_condition()  {
+bool Hero_Party::in_fighting_condition()  {//if any of the heroes is alive returns true
     bool to_return=0;
     for (int i=0;i<heroes.size();i++)  {
         to_return=to_return || (heroes.at(i)->get_health()>0);
@@ -1882,7 +1974,7 @@ void Hero_Party::defeat()  {
 void Hero_Party::victory()  {
     for (int i=0;i<heroes.size();i++)  {
         heroes.at(i)->increase_wealth(100);
-        heroes.at(i)->increase_exp(1000);
+        heroes.at(i)->increase_exp(1200);
         heroes.at(i)->restore_life(heroes.at(i)->get_health_capacity()/2);
         heroes.at(i)->restore_mp(heroes.at(i)->get_magic_power_capacity()/2);
         heroes.at(i)->try_and_level_up();
@@ -1915,7 +2007,7 @@ void Hero_Party::switch_hero()  {
     }
 }
 
-void Hero_Party::receive_input(char input)  {
+void Hero_Party::receive_input(char input)  {//either calls one of the class's methods or redirects input to the hero in control
     switch (input)  {
         case 'w' : //move up
             move_up();
@@ -1930,7 +2022,7 @@ void Hero_Party::receive_input(char input)  {
             move_right();
             break;
         case 'i'://check inventory
-            while (heroes.at(hero_in_control)->receive_input(input))  {
+            while (heroes.at(hero_in_control)->receive_input(input))  {//if any of the following input redirections return true then we switch hero in control
                 switch_hero();
             }
             break;
@@ -1952,7 +2044,7 @@ void Hero_Party::receive_input(char input)  {
         case 'h'://take control of another hero
             switch_hero();
             break;
-        case 'u':
+        case 'u'://check hero stats
             while (heroes.at(hero_in_control)->receive_input(input))  {
                 switch_hero();
             }
@@ -1999,7 +2091,7 @@ Monster_Party::~Monster_Party()  {
 void Monster_Party::prepare_for_next_round()  {
     for (int i=0;i<monsters.size();i++)  {
         if (monsters.at(i)->get_health()!=0)  {
-            monsters.at(i)->restore_life(monsters.at(i)->get_health_capacity()/10);
+            monsters.at(i)->restore_life(monsters.at(i)->get_health_capacity()/10);//restore monster health by 10%
             monsters.at(i)->round_passes();
         }
     }
@@ -2032,56 +2124,53 @@ Fight::Fight(Hero_Party* hero_party) : round_count(1), hero_party(hero_party)  {
     while (true)  {
         message="Round ";
         message.append(std::to_string(round_count));
-        print_battle(message," ",true);
+        print_battle(message," ",true);//show combatants
+        if (quit_game)  {//after each action we always check to see if the global variable has been set to true, so that the quit is performed immediately afterwards
+            return;
+        }
+        heroes_turn();//all heroes play their turn
         if (quit_game)  {
             return;
         }
-        heroes_turn();
-        if (quit_game)  {
-            return;
-        }
-        if (!monster_party->in_fighting_condition())  {
+        if (!monster_party->in_fighting_condition())  {//after they have finished, check whether the monsters are dead 
             print_battle("!!!!!!!!!!!!!Victory!!!!!!!!!!!!!","Gold and Experience awarded to heroes",true);
             hero_party->victory();
             break ;
         }
-        monsters_turn();
+        monsters_turn();//else it's the monsters turn
         if (quit_game)  {
             return;
         }
-        if (!hero_party->in_fighting_condition())  {
+        if (!hero_party->in_fighting_condition())  {//if the heroes have been defeated, print it
             print_battle("^^^^^^^^^^^Defeat^^^^^^^^^","Gold coins have been reduced to half",true);
             hero_party->defeat();
             break ;
         }
-        next_round();
+        next_round();//else advance to the next round
     }
 }
 
 Fight::~Fight()  {
-    delete monster_party;
+    delete monster_party;//the only memory that gets allocated in the Fight sequence is the dynamically generate monster party
 }
 
 void Fight::monsters_turn()  {
-    for (int i=0;i<hero_party->get_number_of_heroes();i++)  {
-        if (monster_party->get_monster(i)->get_health()>0)  {
+    for (int i=0;i<hero_party->get_number_of_heroes();i++)  {//number of heroes==number of monsters
+        if (monster_party->get_monster(i)->get_health()>0)  {//a monster can only attack if it's alive
             Hero* hero_attacked;
             int successful_strike;
             std::string action_message,result_message;
-            short pick_target=rand()%hero_party->get_number_of_heroes();
+            short pick_target=rand()%hero_party->get_number_of_heroes();//trandomly pick a hero to attack
             hero_attacked=hero_party->get_hero(pick_target);
             for (int j=0;j<2;j++)  {
-                pick_target=(pick_target+1)%hero_party->get_number_of_heroes();
-                hero_attacked=hero_party->get_hero(pick_target);
-                if (hero_attacked->get_health()>0)  {
+                if (hero_attacked->get_health()>0)  {//if hero picked is alive, then proceed to attack him, else pick the next hero in line 
                     break;
                 }
-                if (j==1)  {
-                    return ;
-                }
+                pick_target=(pick_target+1)%hero_party->get_number_of_heroes();
+                hero_attacked=hero_party->get_hero(pick_target);
             }
-            successful_strike=monster_party->get_monster(i)->attack(hero_attacked);
-            action_message.append(monster_party->get_monster(i)->get_name());
+            successful_strike=monster_party->get_monster(i)->attack(hero_attacked);//attack the hero and return an integer from which we can learn what was the result of the action
+            action_message.append(monster_party->get_monster(i)->get_name());//same procees as the one with printing the action message in the spell attack
             action_message.append(" attacked ");
             action_message.append(hero_attacked->get_name());
             if (successful_strike>0)  {
@@ -2095,7 +2184,7 @@ void Fight::monsters_turn()  {
             else if (successful_strike==-1)  {
                 result_message.append("Hero evaded the attack");
             }
-            print_battle(action_message,result_message,true);
+            print_battle(action_message,result_message,true);//print the battlefield again but with the addition of the action and result message(the health points of the monsters will have also changed)
             if (quit_game)  {
                 return;
             }
@@ -2115,12 +2204,12 @@ void Fight::heroes_turn()  {
     if (quit_game)  {
         return;
     }
-    while (hero_party->heroes_turn())  {
+    while (hero_party->heroes_turn())  {//one can cycle between the available heroes without using the hero's turn
         print_battle(action,result,false);
-        if (!monster_party->in_fighting_condition())  {
+        if (!monster_party->in_fighting_condition())  {//take into account if the monsters die while a hero still has a turn left 
             return;
         }
-        if (hero_party->get_hero_in_control()->get_health()>0)  {  
+        if (hero_party->get_hero_in_control()->get_health()>0)  {//if hero chosen is alive, proceed with displaying the possible actions he may take
             if (hero_party->get_hero_in_control()->get_turn())  {
                 std::cout << "1.Attack      2.Cast Spell      3.Equip Weapon      4.Equip Armor      5.Use Potion      6.Display Hero Stats      7.Display Monster Stats\n" ;
                 std::cout << "(Switch hero: h) (Quit game: q)\n";
@@ -2144,7 +2233,7 @@ void Fight::heroes_turn()  {
         Monster* monster_to_attack;
         if (check_number(input) && hero_party->get_hero_in_control()->get_turn() && hero_party->get_hero_in_control()->get_health()>0)  {
             switch (atoi(input.c_str()))  {
-                case 1:
+                case 1://attack a monster
                     monster_to_attack=show_available_targets();
                     if (monster_to_attack!=NULL)  {
                         int successful_hit=hero_party->get_hero_in_control()->attack(monster_to_attack);
@@ -2169,7 +2258,7 @@ void Fight::heroes_turn()  {
                         return ;
                     }
                     break;
-                case 2:
+                case 2://select a spell to cast at a monster
                     if (hero_party->get_hero_in_control()->show_availabe_spells_and_promt_for_activation(&hero_party->get_hero_in_control()->get_turn(),&action,&result,this))  {
                         hero_party->switch_hero();
                     }
@@ -2177,7 +2266,7 @@ void Fight::heroes_turn()  {
                         return ;
                     }
                     break;
-                case 3:
+                case 3://equip a weapon
                     if (hero_party->get_hero_in_control()->show_availabe_weapons_and_promt_for_swap(&hero_party->get_hero_in_control()->get_turn(),&action))  {
                         hero_party->switch_hero();
                     }
@@ -2186,7 +2275,7 @@ void Fight::heroes_turn()  {
                         return;
                     }
                     break;
-                case 4:
+                case 4://equip an armor
                     if (hero_party->get_hero_in_control()->show_availabe_armors_and_promt_for_swap(&hero_party->get_hero_in_control()->get_turn(),&action))  {
                         hero_party->switch_hero();
                     }
@@ -2195,7 +2284,7 @@ void Fight::heroes_turn()  {
                         return;
                     }
                     break;
-                case 5:
+                case 5://use a potion
                     if (hero_party->get_hero_in_control()->show_availabe_potions_and_promt_for_use(&hero_party->get_hero_in_control()->get_turn(),&action))  {
                         hero_party->switch_hero();
                     }
@@ -2216,6 +2305,9 @@ void Fight::heroes_turn()  {
                         return;
                     }
                     break;
+                default: 
+                    wrong_action=true;
+                    break;
             }  
         }
         else  {
@@ -2232,14 +2324,14 @@ void Fight::heroes_turn()  {
             }
         }
     }
-    print_battle(action,result,true);
+    print_battle(action,result,true);//print the last action that was taken
     if (quit_game)  {
         return;
     }
     if (!monster_party->in_fighting_condition())  {
         return;
     }
-    print_battle("Monsters Turn","",true);
+    print_battle("Monsters Turn","",true);//inform that the monsters turn will begin
     if (quit_game)  {
         return;
     }
@@ -2247,7 +2339,7 @@ void Fight::heroes_turn()  {
 
 void Fight::display_hero_stats()  {
     while (true)  {
-        if (hero_party->get_hero_in_control()->display_stats())  {
+        if (hero_party->get_hero_in_control()->display_stats())  {//a reminder (if any of the related methods return true it means that we want to switch hero)
             hero_party->switch_hero();
         }
         else  {
@@ -2259,7 +2351,7 @@ void Fight::display_hero_stats()  {
 void Fight::display_monster_stats()  {
     int i=0;
     while (true)  {
-        if (monster_party->get_monster(i)->display_stats())  {
+        if (monster_party->get_monster(i)->display_stats())  {//if returns true, look at the next monsters stats
             i=(i+1)%hero_party->get_number_of_heroes();
         }
         else  {
@@ -2270,10 +2362,10 @@ void Fight::display_monster_stats()  {
 
 void Fight::print_battle(std::string action_message,std::string result_message,bool wait_for_input)  {
     system("clear");
-    int padding[3];
-    int length[3];
-    int name_set_to_center[3];
-    int distance=4;
+    int padding[3];//<-several parameters that will hold important information in order to make the display of the game entities better 
+    int length[3];//aspects like, the names always being at the center above the sketch's figure, the sketches being moved in order to accomodate for the extra space a name might take etc
+    int name_set_to_center[3];//try not to focus too much on how those are calculated as they is merely a quality of life addition
+    int distance=4;//be adivised that all the mathematical actions that will follow are the result of numerous experimentations(therefore it is difficult to explain them properly)
     int hp_length;
     int hp_max_length;
     for (int x=0;x<hero_party->get_number_of_heroes();x++)  {
@@ -2283,22 +2375,22 @@ void Fight::print_battle(std::string action_message,std::string result_message,b
             length[x]=monster_party->get_monster(x)->get_name().length()+4+hp_length+hp_max_length;
         }
         else  {
-            length[x]=25;
+            length[x]=25;//minimum length of the placeholder for an entity's name.(due to the size of each sketch)
         }
-        padding[x]=length[x]/2-12;
+        padding[x]=length[x]/2-12;//the padding, or in other words, the amount of spaces a sketch will be pushed to the right compared to the position it should be placed
         name_set_to_center[x]=(length[x]-(monster_party->get_monster(x)->get_name().length()+4+hp_length+hp_max_length))/2;
         for (int i=0;i<name_set_to_center[x];i++)  {
-            std::cout << " ";
+            std::cout << " ";//print spaces until we reach the optimal starting position for the name to be centered around the skecth
         }
         std::cout <<monster_party->get_monster(x)->get_name()<<" ("<< monster_party->get_monster(x)->get_health()<<"/"<<monster_party->get_monster(x)->get_health_capacity() <<")";
-        for (int i=0;i<name_set_to_center[x]+distance;i++)  {
+        for (int i=0;i<name_set_to_center[x]+distance;i++)  {//fill the other side of blanks, where the name stops
             std::cout << " ";
         }
     }
     std::cout <<'\n';
     for (int line=0;line<11;line++)  {
         for (int x=0;x<hero_party->get_number_of_heroes();x++)  {
-            for (int i=0;i<padding[x];i++)  {
+            for (int i=0;i<padding[x];i++)  {//based on the padding for each monster, fill the neccesary space before beggining to print the sketch
                 std::cout<< " ";
             }
             if (monster_party->get_monster(x)->get_health()>0)  {
@@ -2318,22 +2410,22 @@ void Fight::print_battle(std::string action_message,std::string result_message,b
                 std::cout << names_and_sketches::Dead_Foe_components[line];
             }
             for (int i=0;i<padding[x]+distance;i++)  {
-                std::cout<< " ";
+                std::cout<< " ";//fill the other side of the right side of the sketch, while also adding some extra distance between the two skecthes
             }
         }
         std::cout << '\n';
     }
     std::cout <<"\n\n";
-    for (int i=0;i<hero_party->get_number_of_heroes()*(25/2);i++)  {
+    for (int i=0;i<hero_party->get_number_of_heroes()*(25/2);i++)  {//fill in enough spaces so that the action message is displayed in the middle point of the heroes
         std::cout << " ";
     }
     std::cout<< action_message << '\n';
-    for (int i=0;i<hero_party->get_number_of_heroes()*(25/2);i++)  {
+    for (int i=0;i<hero_party->get_number_of_heroes()*(25/2);i++)  {//same as in the result message
         std::cout << " ";
     }
     std::cout<< result_message << '\n';
     std::cout <<"\n\n";
-    for (int x=0;x<hero_party->get_number_of_heroes();x++)  {
+    for (int x=0;x<hero_party->get_number_of_heroes();x++)  {//same procedure for the heroes, nothing more to add here
         hp_length=count_digit(monster_party->get_monster(x)->get_health());
         hp_max_length=count_digit(monster_party->get_monster(x)->get_health_capacity());
         if ((hero_party->get_hero(x)->get_name().length()+4+hp_length+hp_max_length)>25)  {
@@ -2386,7 +2478,7 @@ void Fight::print_battle(std::string action_message,std::string result_message,b
             for (int j=0;j<position+length[i]/2-8;j++)  {
                 std::cout << " ";
             }
-            std::cout << "[Hero in control]\n";   
+            std::cout << "[Hero in control]\n";//below the hero we are currenty controlling add the related message
             break; 
         }
         else  {
@@ -2394,7 +2486,7 @@ void Fight::print_battle(std::string action_message,std::string result_message,b
         }
     }
     std::string to_trash_can;
-    if (wait_for_input)  {
+    if (wait_for_input)  {//depending on whether we are in a situation where we switch between rounds or the opposing party begins its turn, we want to wait for an input of any kind so that the user sees the information displayed
         std::cout << "(Guit game: q)\n";
         std::cout << "Press any button to continue:";
         std::cin >> to_trash_can;
@@ -2487,23 +2579,22 @@ Market::Market(int number_of_wares_to_generate) : visited(false) {
                     break;
                 case 2:
                     type=rand()%5;
-                    items.push_back(new Potion(names_and_sketches::get_random_potion_name(),get_potion_price(level),level,get_potion_effect(level,type),type));
+                    items.push_back(new Potion(names_and_sketches::get_random_potion_name(),get_potion_price(level,type),level,get_potion_effect(level,type),type));
                     break;
             }
         }
         else  {
             short type_of_spell=rand()%3;
             int level=get_pseudo_random_level();
-            int mp_cost=get_mp_usage(level);
             switch (type_of_spell)  {    
                 case 0:
-                    spells.push_back(new LigthingSpell(names_and_sketches::get_random_spell_name(),get_spell_price(level),level,mp_cost,get_spell_damage(level,mp_cost)));
+                    spells.push_back(new LigthingSpell(names_and_sketches::get_random_spell_name(),get_spell_price(level),level,get_mp_usage(level),get_spell_damage(level)));
                     break;
                 case 1:
-                    spells.push_back(new FireSpell(names_and_sketches::get_random_spell_name(),get_spell_price(level),level,mp_cost,get_spell_damage(level,mp_cost)));
+                    spells.push_back(new FireSpell(names_and_sketches::get_random_spell_name(),get_spell_price(level),level,get_mp_usage(level),get_spell_damage(level)));
                     break;
                 case 2:
-                    spells.push_back(new IceSpell(names_and_sketches::get_random_spell_name(),get_spell_price(level),level,mp_cost,get_spell_damage(level,mp_cost)));
+                    spells.push_back(new IceSpell(names_and_sketches::get_random_spell_name(),get_spell_price(level),level,get_mp_usage(level),get_spell_damage(level)));
                     break;
                 default:
                     break;
@@ -2593,7 +2684,19 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 system("clear");
                 Item* item_choices[items.size()];
                 int items_count=0;
-                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name()<< " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n';                 
+                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name();
+                switch (hero_party->get_hero_in_control()->get_hero_type())  {
+                    case 0:
+                        std::cout << "(Warrior)";
+                        break;
+                    case 1:
+                        std::cout << "(Paladin)";
+                        break;
+                    case 2:
+                        std::cout << "(Sorcerer)";
+                        break;
+                }
+                std::cout << " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n';                 
                 std::cout << "Items:\n";
                 Item* item;
                 for (int i=0;i<items.size();i++)  {
@@ -2737,7 +2840,19 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 Spell* spell_choices[spells.size()];
                 system("clear");
                 int spells_count=0;
-                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name()<< " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n'; 
+                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name();
+                switch (hero_party->get_hero_in_control()->get_hero_type())  {
+                    case 0:
+                        std::cout << "(Warrior)";
+                        break;
+                    case 1:
+                        std::cout << "(Paladin)";
+                        break;
+                    case 2:
+                        std::cout << "(Sorcerer)";
+                        break;
+                }
+                std::cout << " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n'; 
                 std::cout << "Spells:\n";
                 Spell* spell;
                 for (int i=0;i<spells.size();i++)  {
@@ -2860,7 +2975,19 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 system("clear");
                 Item* item_choices[hero_party->get_hero_in_control()->get_item_box().size()];
                 int items_count=0;
-                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name()<< " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n'; 
+                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name();
+                switch (hero_party->get_hero_in_control()->get_hero_type())  {
+                    case 0:
+                        std::cout << "(Warrior)";
+                        break;
+                    case 1:
+                        std::cout << "(Paladin)";
+                        break;
+                    case 2:
+                        std::cout << "(Sorcerer)";
+                        break;
+                }
+                std::cout << " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n'; 
                 std::cout << "Items:\n";
                 Item* item;
                 for (int i=0;i<hero_party->get_hero_in_control()->get_item_box().size();i++)  {
@@ -3002,7 +3129,19 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 Spell* spell_choices[hero_party->get_hero_in_control()->get_spells().size()];
                 system("clear");
                 int spells_count=0;
-                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name()<< " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n'; 
+                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name();
+                switch (hero_party->get_hero_in_control()->get_hero_type())  {
+                    case 0:
+                        std::cout << "(Warrior)";
+                        break;
+                    case 1:
+                        std::cout << "(Paladin)";
+                        break;
+                    case 2:
+                        std::cout << "(Sorcerer)";
+                        break;
+                }
+                std::cout << " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n'; 
                 std::cout << "Spells:\n";
                 Spell* spell;
                 for (int i=0;i<hero_party->get_hero_in_control()->get_spells().size();i++)  {

@@ -265,7 +265,7 @@ namespace names_and_sketches {//some jaw-dropping original sketches whose cutene
             }
         }
         if (possibility_counter==0)  {
-            return NULL;
+            return ".";
         }
         int choice=rand()%possibility_counter;
         std::string to_return=possible_names[choice];
@@ -286,6 +286,9 @@ namespace names_and_sketches {//some jaw-dropping original sketches whose cutene
                 possibility_counter++;
             }
         }
+        if (possibility_counter==0)  {
+            return ".";
+        }
         int choice=rand()%possibility_counter;
         std::string to_return=possible_names[choice];
         for (int i=0;i<66;i++)  {
@@ -304,6 +307,9 @@ namespace names_and_sketches {//some jaw-dropping original sketches whose cutene
                 possible_names[possibility_counter]=spell_names[i];
                 possibility_counter++;
             }
+        }
+        if (possibility_counter==0)  {
+            return ".";
         }
         int choice=rand()%possibility_counter;
         std::string to_return=possible_names[choice];
@@ -324,6 +330,9 @@ namespace names_and_sketches {//some jaw-dropping original sketches whose cutene
                 possibility_counter++;
             }
         }
+        if (possibility_counter==0)  {
+            return ".";
+        }
         int choice=rand()%possibility_counter;
         std::string to_return=possible_names[choice];
         for (int i=0;i<119;i++)  {
@@ -342,6 +351,9 @@ namespace names_and_sketches {//some jaw-dropping original sketches whose cutene
                 possible_names[possibility_counter]=armor_names[i];
                 possibility_counter++;
             }
+        }
+        if (possibility_counter==0)  {
+            return ".";
         }
         int choice=rand()%possibility_counter;
         std::string to_return=possible_names[choice];
@@ -2084,6 +2096,7 @@ Monster_Party::Monster_Party(int lvl,int number_of_monsters)  {
 
 Monster_Party::~Monster_Party()  {
     for (int i=0;i<monsters.size();i++)  {
+        names_and_sketches::re_entry(monsters.at(i)->get_name());
         delete monsters.at(i);
     }
 }
@@ -2109,11 +2122,6 @@ Monster* Monster_Party::get_monster(int i)  {
     return monsters.at(i);
 }
 
-void Monster_Party::victory()  {
-    for (int i=0;i<monsters.size();i++)  {
-        names_and_sketches::re_entry(monsters.at(i)->get_name());
-    }
-}
 
 //////////////////////////////////////////////////////Fight////////////////////////////////////////
 
@@ -2503,7 +2511,7 @@ Monster* Fight::show_available_targets()  {
     while (true)  {
         print_battle("","",false);
         std::cout << "Targets available:\n";
-        for (int i=0;i<hero_party->get_number_of_heroes();i++)  {
+        for (int i=0;i<hero_party->get_number_of_heroes();i++)  {//display every target along with his health
             std::cout << i+1 << "." << monster_party->get_monster(i)->get_name(); 
             if (monster_party->get_monster(i)->get_health()>0)  {
                 std::cout << "("<< monster_party->get_monster(i)->get_health() <<"/"<< monster_party->get_monster(i)->get_health_capacity() <<")\n";            
@@ -2513,7 +2521,7 @@ Monster* Fight::show_available_targets()  {
             }
         }
         std::cout << "(Go Back: b) (Quit game: q)\n";
-        if (target_is_already_dead)  {
+        if (target_is_already_dead)  {//if chosen to attack an already dead target
             std::cout << "Target is already dead. ";
             target_is_already_dead=false;
         }
@@ -2528,7 +2536,7 @@ Monster* Fight::show_available_targets()  {
             int choice=atoi(input.c_str())-1;
             if (choice<hero_party->get_number_of_heroes() && choice>=0)  {
                 if (monster_party->get_monster(choice)->get_health()>0)  {
-                    return monster_party->get_monster(choice);
+                    return monster_party->get_monster(choice);//return the monster chosen
                 }
                 else  {
                     target_is_already_dead=true;
@@ -2569,32 +2577,58 @@ Market::Market(int number_of_wares_to_generate) : visited(false) {
             int level=get_pseudo_random_level();
             bool two_handed;
             int type;
+            std::string name;
             switch (type_of_item)  {
                 case 0:
                     two_handed=rand()%2;
-                    items.push_back(new Weapon(names_and_sketches::get_random_weapon_name(),get_weapon_armor_price(level),level,get_weapon_attack(level,two_handed),two_handed));
+                    name=names_and_sketches::get_random_weapon_name();//will return "." if there are no names left to use
+                    if (name.compare(".")==0)  {//on the case that there are no names left in the name pool, we don't create any merchandise
+                        break;
+                    }
+                    items.push_back(new Weapon(name,get_weapon_armor_price(level),level,get_weapon_attack(level,two_handed),two_handed));
                     break;
                 case 1:
-                    items.push_back(new Armor(names_and_sketches::get_random_armor_name(),get_weapon_armor_price(level),level,get_armor_defense(level)));
+                    name=names_and_sketches::get_random_armor_name();
+                    if (name.compare(".")==0)  {
+                        break;
+                    }
+                    items.push_back(new Armor(name,get_weapon_armor_price(level),level,get_armor_defense(level)));
                     break;
                 case 2:
+                    name=names_and_sketches::get_random_potion_name();
                     type=rand()%5;
-                    items.push_back(new Potion(names_and_sketches::get_random_potion_name(),get_potion_price(level,type),level,get_potion_effect(level,type),type));
+                    if (name.compare(".")==0)  {
+                        break;
+                    }
+                    items.push_back(new Potion(name,get_potion_price(level,type),level,get_potion_effect(level,type),type));
                     break;
             }
         }
         else  {
             short type_of_spell=rand()%3;
             int level=get_pseudo_random_level();
+            std::string name;
             switch (type_of_spell)  {    
                 case 0:
-                    spells.push_back(new LigthingSpell(names_and_sketches::get_random_spell_name(),get_spell_price(level),level,get_mp_usage(level),get_spell_damage(level)));
+                    name=names_and_sketches::get_random_spell_name();
+                    if (name.compare(".")==0)  {
+                        break;
+                    }
+                    spells.push_back(new LigthingSpell(name,get_spell_price(level),level,get_mp_usage(level),get_spell_damage(level)));
                     break;
                 case 1:
-                    spells.push_back(new FireSpell(names_and_sketches::get_random_spell_name(),get_spell_price(level),level,get_mp_usage(level),get_spell_damage(level)));
+                    name=names_and_sketches::get_random_spell_name();
+                    if (name.compare(".")==0)  {
+                        break;
+                    }
+                    spells.push_back(new FireSpell(name,get_spell_price(level),level,get_mp_usage(level),get_spell_damage(level)));
                     break;
                 case 2:
-                    spells.push_back(new IceSpell(names_and_sketches::get_random_spell_name(),get_spell_price(level),level,get_mp_usage(level),get_spell_damage(level)));
+                    name=names_and_sketches::get_random_spell_name();
+                    if (name.compare(".")==0)  {
+                        break;
+                    }
+                    spells.push_back(new IceSpell(name,get_spell_price(level),level,get_mp_usage(level),get_spell_damage(level)));
                     break;
                 default:
                     break;
@@ -2607,8 +2641,8 @@ Market::~Market()  {
     while (items.size()!=0)  {
         std::list<Item*>::iterator it=items.begin();
         Item* to_delete=it.operator*();
-        items.erase(it);
-        delete to_delete;
+        items.erase(it);//remove it from the list
+        delete to_delete;//and delete the memory it has allocated
     }
     while (spells.size()!=0)  {
         std::list<Spell*>::iterator it2=spells.begin();
@@ -2621,28 +2655,28 @@ Market::~Market()  {
 std::string Market::buy_item(std::string item_name,Hero* hero)  {
     std::list<Item*>::iterator it=items.begin();
     for (int i=0;i<items.size();i++)  {
-        if (it.operator*()->get_name().compare(item_name)==0)  {
-            hero->lose_money(it.operator*()->get_price());
-            hero->acquire_item(it.operator*());
+        if (it.operator*()->get_name().compare(item_name)==0)  {//find the item the hero bought
+            hero->lose_money(it.operator*()->get_price());//reduce heroes money
+            hero->acquire_item(it.operator*());//and proceed to append it to his item box
             std::string to_return=it.operator*()->get_name();
-            items.erase(it);
-            return to_return;
+            items.erase(it);//we also remove said item pointer from the market
+            return to_return;//return item name in order to show the transaction in the terminal
         }
         else  {
-            std::advance(it,1);
+            std::advance(it,1);//advance the iterator until we find the item the hero bought
         }
     }
     return NULL;
 }
 
 std::string Market::sell_item(std::string item_name,Hero* hero)  {
-    Item* item=hero->remove_item(item_name);
+    Item* item=hero->remove_item(item_name);//remove the item's pointer from the hero's item box
     hero->increase_wealth(item->get_price()/2);
-    items.insert(items.begin(),item);
+    items.insert(items.begin(),item);//and append it to the market 
     return item->get_name();
 }
 
-std::string Market::buy_spell(std::string spell_name,Hero* hero)  {
+std::string Market::buy_spell(std::string spell_name,Hero* hero)  {//like wise with above transactions 
     std::list<Spell*>::iterator it=spells.begin();
     for (int i=0;i<spells.size();i++)  {
         if (it.operator*()->get_name().compare(spell_name)==0)  {
@@ -2667,10 +2701,10 @@ std::string Market::sell_spell(std::string spell_name,Hero* hero)  {
 }
 
 void Market::browse_wares(Hero_Party* hero_party)  {
-    visited=true;
-    bool buy_or_sell=1;
-    bool item_or_spell=1;
-    bool wrong_action=false;
+    visited=true;//on the first time a hero browses a market, the "visited" boolean will becoma true
+    bool buy_or_sell=1;// 1 for buy and 0 for sell windows
+    bool item_or_spell=1;// 1 for item transactions (be it buy item or sell item) and 0 for spell transactions
+    bool wrong_action=false;//some self explainatory action messages
     bool not_enough_money=false;
     bool successful_purchase=false;
     bool successful_sale=false;
@@ -2684,7 +2718,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 system("clear");
                 Item* item_choices[items.size()];
                 int items_count=0;
-                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name();
+                std::cout << "Hero name:" << hero_party->get_hero_in_control()->get_name();//we also display the hero's class so that user knows what item he should go for
                 switch (hero_party->get_hero_in_control()->get_hero_type())  {
                     case 0:
                         std::cout << "(Warrior)";
@@ -2699,7 +2733,7 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 std::cout << " Lvl."<<hero_party->get_heroes_level()<<" Gold:" <<hero_party->get_hero_in_control()->get_wealth()<<'\n';                 
                 std::cout << "Items:\n";
                 Item* item;
-                for (int i=0;i<items.size();i++)  {
+                for (int i=0;i<items.size();i++)  {//display all items, similar to the other displaying functions
                     if (it.operator*()->get_type_of_item()==0)  {
                         item=it.operator*();
                         std::cout << i+1 <<"." << item->get_name()<<"(Weapon)";
@@ -2790,9 +2824,9 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                 std::cin >> input; 
                 if (check_number(input))  {
                     int pick=atoi(input.c_str())-1;
-                    if (pick<items_count && pick>=0)  {
-                        if (item_choices[pick]->get_price()<=hero_party->get_hero_in_control()->get_wealth())  {
-                            merchandise_traded=buy_item(item_choices[pick]->get_name(),hero_party->get_hero_in_control());
+                    if (pick<items_count && pick>=0)  {//if given a proper item selection
+                        if (item_choices[pick]->get_price()<=hero_party->get_hero_in_control()->get_wealth())  {//if item's price is whithin hero's budget
+                            merchandise_traded=buy_item(item_choices[pick]->get_name(),hero_party->get_hero_in_control());//buy it and show the succesful purchase message in the next window that will appear 
                             successful_purchase=true;
 
                         }
@@ -2814,11 +2848,11 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         return;
                     }
                     else if (input.compare("c")==0)  {
-                        item_or_spell=false;
+                        item_or_spell=false;//go to the buy spell window in the next instace of the loop
                         continue;
                     }
                     else if (input.compare("t")==0)  {
-                        buy_or_sell=false;
+                        buy_or_sell=false;//go to the sell item window in the next instance of the loop
                         continue;
                     }
                     else if (input.compare("h")==0)//take control of another hero
@@ -2947,11 +2981,11 @@ void Market::browse_wares(Hero_Party* hero_party)  {
                         return;
                     }
                     else if (input.compare("c")==0)  {
-                        item_or_spell=true;
+                        item_or_spell=true;//go to the sell item window in the next instance
                         continue;
                     }
                     else if (input.compare("t")==0)  {
-                        buy_or_sell=false;
+                        buy_or_sell=false;//go to buy spell window
                         continue;
                     }
                     else if (input.compare("h")==0)//take control of another hero
@@ -3311,16 +3345,16 @@ bool Block::has_been_visited()  {
 }
 //////////////////////////////////////////////////////Grid////////////////////////////////////////
 
-Grid::Grid(int size,int number_of_heroes) : size(size), hero_vision(5) {
+Grid::Grid(int size,int number_of_heroes) : size(size), hero_vision(5) {//hero vision is the amount of blocks in a straight line the hero can see
     srand(time(NULL));
     int quarter_x;
     int quarter_y;
     int market_x_pos;
     int market_y_pos;
-    int number_of_areas=1+(size/16);
-    float density_of_blocks=0.2;
-    hero_party=new Hero_Party((size+2*hero_vision)/2,(size+2*hero_vision)/2,number_of_heroes);
-    World=new Block**[size+2*hero_vision];
+    int number_of_areas=1+(size/16);//we will cut the grid into (number_of_areas)x(number_of_areas) areas, so that in each one a market will be created
+    float density_of_blocks=0.2;//ratio of non accesible to accesible blocks
+    hero_party=new Hero_Party((size+2*hero_vision)/2,(size+2*hero_vision)/2,number_of_heroes);//create a hero party with a starting position at the center of a (size+2*hero_vision)x(size+2*hero_vision) grid
+    World=new Block**[size+2*hero_vision];//the addition of +2*hero_vision to the size of the grid is because instead of writing code for the terminal display of when the hero is near the edge of the grid, we simply take advantage of the alrdeady existing rules of our game and fill the edges with non accesible blocks(up to the maximum distance of where the hero can see)
     for (int i=0;i<size+2*hero_vision;i++)  {
         World[i]=new Block*[size+2*hero_vision];
         for (int j=0;j<size+2*hero_vision;j++)  {
@@ -3328,37 +3362,40 @@ Grid::Grid(int size,int number_of_heroes) : size(size), hero_vision(5) {
                 World[i][j]=NULL;
             }
             else  {
-                World[i][j]=new Block(0,0);
+                World[i][j]=new Block(0,0);//fill the edges with non accesible blocks 
             }
         }
     }
     encounter_chance=0.1;
-    for (int i=0;i<number_of_areas-1;i++)  {
+    for (int i=0;i<number_of_areas-1;i++)  {//create 
         quarter_x=(size/number_of_areas)*i+hero_vision;
         for (int j=0;j<number_of_areas;j++)  {
             quarter_y=(size/number_of_areas)*j+hero_vision;
-            market_x_pos=quarter_x+rand()%(size/number_of_areas);
+            market_x_pos=quarter_x+rand()%(size/number_of_areas);//pick a random x and y position within the bounds of out current area to place a market
             market_y_pos=quarter_y+rand()%(size/number_of_areas);
             World[market_x_pos][market_y_pos]=new Block(1,1);
         }
     }
-    for (int i=0;i<size+2*hero_vision;i++)  {
+    for (int i=0;i<size+2*hero_vision;i++)  {//now that we have placed the markets and all the neccessary non accesible blocks, we fill all the remaining positions with a normal block 
         for (int j=0;j<size+2*hero_vision;j++)  {
             if (World[i][j]==NULL)  {
                 World[i][j]=new Block(1,0);
             }
        }
     }
-    for (int i=hero_vision;i<size+hero_vision;i++)  {
-        for (int j=0;j<int(density_of_blocks*size+0.5);j++)  {
+    for (int i=hero_vision;i<size+hero_vision;i++)  {//and afterwards we decide which of those normal accesible blocks we want to turn into a non accesible
+        for (int j=0;j<int(density_of_blocks*size+0.5);j++)  {//for each collumn of the map,set as a number blocks to non accesible based on the aforementioned ratio 
             int pick_non_accesible_block;
             int possible_choices_counter=0;
             int possible_choices[size];
             for (int k=hero_vision;k<size+hero_vision;k++)  {
-                if (!World[i][k]->is_a_market() && (i!=hero_party->get_y_position() || k!=hero_party->get_x_position()))  {
-                    possible_choices[possible_choices_counter]=k;
+                if (!World[i][k]->is_a_market() && (i!=hero_party->get_y_position() || k!=hero_party->get_x_position()))  {//a market block or the starting position block must not become  a non acccesible block
+                    possible_choices[possible_choices_counter]=k;//although...there is a possibility that all four blocks horizontally and vertically of the starting position become non accesible...if this happens then quit and restart...^-^ 
                     possible_choices_counter++;
                 }
+            }
+            if (possible_choices_counter==0)  {//shouldn't happen. hasn't happened. can't hurt to be careful though
+                continue;
             }
             pick_non_accesible_block=rand()%possible_choices_counter;
             World[i][possible_choices[pick_non_accesible_block]]->set_to_non_accessible();
@@ -3379,7 +3416,7 @@ Grid::~Grid()  {
 
 bool Grid::fight_triggered()  {
     short dice=rand()%7;
-    if (dice==0)  {
+    if (dice==0)  {// 1 out of 7 steps will be a fight on average
         return true;
     }
     else  {
@@ -3387,27 +3424,27 @@ bool Grid::fight_triggered()  {
     }
 }
 
-void Grid::print_world(bool blocked_passage,bool wrong_action)  {
+void Grid::print_world(bool blocked_passage,bool wrong_action)  {//the grid has a pokemon like display, with the heroes always being printed at the center and the rest of the world seemingly following them
     int centre_x=hero_party->get_x_position();
     int centre_y=hero_party->get_y_position();
     system("clear");
     for (int i=centre_y-hero_vision;i<=centre_y+hero_vision;i++)  {
         for (int k=0;k<2*hero_vision+1;k++)  {
-            std::cout << "---------";
+            std::cout << "---------";//separates each line 
         }
         std::cout << "-\n";
         for (int j=centre_x-hero_vision;j<=centre_x+hero_vision;j++)  {
             if (i==centre_y && j==centre_x)  {
                 if (World[i][j]->is_a_market())  {
-                    std::cout << " User(S)|";
+                    std::cout << " User(S)|";//if user is in a market
                 }
                 else  {
-                    std::cout << "  User  |";
+                    std::cout << "  User  |";//normal user state
                 }
             }
             else  {
                 if (j==centre_x-hero_vision)  {
-                    std::cout <<'|';
+                    std::cout <<'|';//set the start of each left edge to |
                 }
                 if (World[i][j]->is_accessible())  {
                     if (World[i][j]->is_a_market())  {
@@ -3416,16 +3453,16 @@ void Grid::print_world(bool blocked_passage,bool wrong_action)  {
                             std::cout<<" ";
                         }
                         else  {
-                            std::cout <<"!";
+                            std::cout <<"!";//an ! is appended to an unvisited market
                         }
                         std::cout << " |";
                     }
                     else  {
-                        std::cout << "        |";
+                        std::cout << "        |";//empty block
                     }
                 }
                 else if (!World[i][j]->is_accessible())  {
-                    std::cout << " XXXXXX |";
+                    std::cout << " XXXXXX |";//non accesible block
                 }
             }
         }
@@ -3436,7 +3473,7 @@ void Grid::print_world(bool blocked_passage,bool wrong_action)  {
     }
     std::cout << "-\n";
     std::cout << '\n';
-    std::cout << "Available options:\n";
+    std::cout << "Available options:\n";//simply displays all possible actions, input is received by another method
     std::cout << " (Move Up: w) ";
     std::cout << "(Move Down: s) ";
     std::cout << "(Move Left: a) ";
@@ -3462,20 +3499,20 @@ void Grid::print_world(bool blocked_passage,bool wrong_action)  {
     std::cout << "Please enter an action:\n";
 }
 
-void Grid::receive_input()  {
+void Grid::receive_input()  {//this method will only be called once 
     std::string input;
     bool blocked_passage=false;
     bool wrong_action=false;
-    while(!quit_game)  {
+    while(!quit_game)  {//will go on an endless loop until user decides to quit the game
         print_world(blocked_passage,wrong_action);
         blocked_passage=false;
         wrong_action=false;
         std::cin >> input;
-        char actual_input=input[0];
+        char actual_input=input[0];//no matter how many action orders have been given, we will only execute the first letter(if we where to call getchar() instead then a sequence of "aaa^Enter" would cound as three leftsm which we don't want)
         switch (actual_input)  {
             case 'w' : //move up
-                if (World[hero_party->get_y_position()-1][hero_party->get_x_position()]->is_accessible())  {
-                    hero_party->receive_input(actual_input);
+                if (World[hero_party->get_y_position()-1][hero_party->get_x_position()]->is_accessible())  {//if hero can move to this direction
+                    hero_party->receive_input(actual_input);//redirect input to the unit that is fit to handle it 
                     if (!World[hero_party->get_y_position()][hero_party->get_x_position()]->is_a_market())  {
                         if (fight_triggered())  {
                             fight=new Fight(hero_party);
@@ -3484,7 +3521,7 @@ void Grid::receive_input()  {
                     }
                 }
                 else  {
-                    blocked_passage=true;
+                    blocked_passage=true;//else display error that it is a blocked passage in the next instance of the loop
                 }
                 break;
             case 's'://move down

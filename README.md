@@ -1,7 +1,7 @@
 # Game
 
-Run by ./aout MapSize NumberHeroes 
-(e.x ./aout 100 3)
+Arguments for executable are: MapSize NumberHeroes 
+(e.x ./game 100 3)
 
 Creates a game world that is shown in linux terminal which works in a top-down 2d view, and consists of a hero party traversing the worl by receiving input from users
 and occasionally being ambushed by monsters from where a pokemon-style turn-based fight procceeds to happen.
